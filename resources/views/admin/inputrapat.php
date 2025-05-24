@@ -64,7 +64,7 @@
             
             <li
                 class="sidebar-item">
-                <a href="index.html" class='sidebar-link'>
+                <a href="/dashboard" class='sidebar-link'>
                     <i class="bi bi-grid-fill"></i>
                     <span>Dashboard</span>
                 </a>
@@ -72,21 +72,21 @@
             </li>
                         <li
                 class="sidebar-item active ">
-                <a href="index.html" class='sidebar-link'>
+                <a href="/viewrapat" class='sidebar-link'>
                     <i class="bi bi-stack"></i>
                     <span>Rapat dan Koordinasi</span>
                 </a>
             
             <li
                 class="sidebar-item ">
-                <a href="index.html" class='sidebar-link'>
+                <a href="/viewiuran" class='sidebar-link'>
                     <i class="bi bi-cash"></i>
                     <span>Iuran</span>
                 </a>
             
             <li
                 class="sidebar-item ">
-                <a href="index.html" class='sidebar-link'>
+                <a href="/viewkaderisasi" class='sidebar-link'>
                     <i class="bi bi-person-badge-fill"></i>
                     <span>Kaderisasi</span>
                 </a>
@@ -113,7 +113,9 @@
             </header>
             
 <div class="page-heading">
-    <h3>Aplikasi Monitoring DPC PKB Bengkalis</h3>
+    <h3>Rapat dan Koordinasi</h3>
+    <p class="text-subtitle text-muted">Berikut merupakan menu dari rapat dan koordinasi yang dapat digunakan untuk melaporkan kegiatan seputar rapat
+                </p>
 
  <div class="page-content">
     <section class="row">

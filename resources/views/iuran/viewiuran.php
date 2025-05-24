@@ -102,12 +102,24 @@
     </div>
 </div>
             
-<div class="page-content" style="padding-left: 280px; padding-right: 20px;">
+ </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+<div class="page-heading">
+    <h3>Iuran</h3>
+    <p class="text-subtitle text-muted">Berikut merupakan menu dari iuran yang dapat digunakan untuk melaporkan segala iuran yang telah bapak/ibu lakukan
+                </p>
+
     <section class="section">
         <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title">Data Iuran</h5>
-                <a href="{{ route('iuran.create') }}" class="btn btn-primary">Tambah Iuran</a>
+            <div class="card-header">
+                <h4 class="card-title">Data Iuran</h4> <a href="/inputiuran" class="btn btn-primary float-end">Tambah Iuran</a>
+                <p class="text-subtitle text-muted">Berikut merupakan data seputar rapat yang bapak/ibu inputkan
+                </p>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -149,7 +161,6 @@
     </section>
 </div>
 
-@section('scripts')
     <script src="{{ asset('assets/extensions/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('assets/extensions/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/extensions/datatables.net-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
@@ -179,10 +190,6 @@
     <div class="footer clearfix mb-0 text-muted">
         <div class="float-start">
             <p>2023 &copy; Mazer</p>
-        </div>
-        <div class="float-end">
-            <p>Crafted with <span class="text-danger"><i class="bi bi-heart-fill icon-mid"></i></span>
-                by <a href="https://saugi.me">Saugi</a></p>
         </div>
     </div>
 </footer>

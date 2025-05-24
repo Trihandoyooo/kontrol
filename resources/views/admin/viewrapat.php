@@ -58,13 +58,13 @@
             </div>
         </div>
     </div>
-    <div class="sidebar-menu">
+   <div class="sidebar-menu">
         <ul class="menu">
             <li class="sidebar-title">Menu</li>
             
             <li
-                class="sidebar-item">
-                <a href="index.html" class='sidebar-link'>
+                class="sidebar-item ">
+                <a href="/dashboard" class='sidebar-link'>
                     <i class="bi bi-grid-fill"></i>
                     <span>Dashboard</span>
                 </a>
@@ -72,21 +72,21 @@
             </li>
                         <li
                 class="sidebar-item active">
-                <a href="index.html" class='sidebar-link'>
+                <a href="/viewrapat" class='sidebar-link'>
                     <i class="bi bi-stack"></i>
                     <span>Rapat dan Koordinasi</span>
                 </a>
             
             <li
                 class="sidebar-item ">
-                <a href="index.html" class='sidebar-link'>
+                <a href="/viewiuran" class='sidebar-link'>
                     <i class="bi bi-cash"></i>
                     <span>Iuran</span>
                 </a>
             
             <li
                 class="sidebar-item ">
-                <a href="index.html" class='sidebar-link'>
+                <a href="/viewkaderisasi" class='sidebar-link'>
                     <i class="bi bi-person-badge-fill"></i>
                     <span>Kaderisasi</span>
                 </a>
@@ -101,13 +101,27 @@
         </ul>
     </div>
 </div>
-            
-<div class="page-content" style="padding-left: 280px; padding-right: 20px;">
+
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+<div class="page-heading">
+    <h3>Rapat dan Koordinasi</h3>
+    <p class="text-subtitle text-muted">Berikut merupakan menu dari rapat dan koordinasi yang dapat digunakan untuk melaporkan kegiatan seputar rapat
+                </p>
+
     <section class="section">
         <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title">Data Rapat</h5>
-                <a href="{{ route('/inputrapat') }}" class="btn btn-primary">Tambah Rapat</a>
+            <div class="card-header">
+                <h4 class="card-title">Data Rapat</h4> <a href="/inputrapat" class="btn btn-primary float-end">Tambah Rapat</a>
+                <p class="text-subtitle text-muted">Berikut merupakan data seputar rapat yang bapak/ibu inputkan
+                </p>
+
+
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -168,7 +182,6 @@
     </section>
 </div>
 
-@section('scripts')
     <script src="{{ asset('assets/extensions/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('assets/extensions/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/extensions/datatables.net-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
@@ -198,10 +211,6 @@
     <div class="footer clearfix mb-0 text-muted">
         <div class="float-start">
             <p>2023 &copy; Mazer</p>
-        </div>
-        <div class="float-end">
-            <p>Crafted with <span class="text-danger"><i class="bi bi-heart-fill icon-mid"></i></span>
-                by <a href="https://saugi.me">Saugi</a></p>
         </div>
     </div>
 </footer>
