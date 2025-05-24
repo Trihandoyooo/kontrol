@@ -140,7 +140,7 @@
                                     <td>23 Mei 2025</td>
                                     <td>
                             
-                                            <a href="{{ asset('storage/' . $iuran['dokumentasi']) }}" target="_blank" class="badge bg-info">Lihat</a>
+                                            <a href="/viewtransaksi" target="_blank" class="badge bg-info">Lihat</a>
                                         
                                             <span class="badge bg-secondary">Tidak Ada</span>
                                       
