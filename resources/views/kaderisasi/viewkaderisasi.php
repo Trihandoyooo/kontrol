@@ -58,13 +58,13 @@
             </div>
         </div>
     </div>
-    <div class="sidebar-menu">
+ <div class="sidebar-menu">
         <ul class="menu">
             <li class="sidebar-title">Menu</li>
             
             <li
-                class="sidebar-item">
-                <a href="index.html" class='sidebar-link'>
+                class="sidebar-item ">
+                <a href="/dashboard" class='sidebar-link'>
                     <i class="bi bi-grid-fill"></i>
                     <span>Dashboard</span>
                 </a>
@@ -72,21 +72,21 @@
             </li>
                         <li
                 class="sidebar-item ">
-                <a href="index.html" class='sidebar-link'>
+                <a href="/viewrapat" class='sidebar-link'>
                     <i class="bi bi-stack"></i>
                     <span>Rapat dan Koordinasi</span>
                 </a>
             
             <li
-                class="sidebar-item active">
-                <a href="index.html" class='sidebar-link'>
+                class="sidebar-item ">
+                <a href="/viewiuran" class='sidebar-link'>
                     <i class="bi bi-cash"></i>
                     <span>Iuran</span>
                 </a>
             
             <li
-                class="sidebar-item ">
-                <a href="index.html" class='sidebar-link'>
+                class="sidebar-item active">
+                <a href="/viewkaderisasi" class='sidebar-link'>
                     <i class="bi bi-person-badge-fill"></i>
                     <span>Kaderisasi</span>
                 </a>
@@ -107,25 +107,23 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title">Data Iuran</h5>
-                <a href="{{ route('iuran.create') }}" class="btn btn-primary">Tambah Iuran</a>
+                <a href="/inputkaderisasi" class="btn btn-primary">Tambah Kegiatan</a>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table" id="table1">
                         <thead>
                             <tr>
-                                <th>Jenis Iuran</th>
-                                <th>Nominal</th>
-                                <th>Tanggal Setoran</th>
+                                <th>Judul Kegiatan Kaderisasi</th>
+                                <th>Tanggal Pelaksanaan Kegiatan</th>
                                 <th>Dokumentasi</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                                 <tr>
-                                    <td>Iuran Bulanan</td>
-                                    <td>Rp 1000000</td>
-                                    <td>23 Mei 2025</td>
+                                    <td>Kaderisasi Prtama</td>
+                                    <td>22 Mei 2025</td>
                                     <td>
                             
                                             <a href="{{ asset('storage/' . $iuran['dokumentasi']) }}" target="_blank" class="badge bg-info">Lihat</a>
