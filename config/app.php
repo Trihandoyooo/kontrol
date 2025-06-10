@@ -154,6 +154,26 @@ return [
     | this array to grant expanded functionality to your applications.
     |
     */
+    'providers' => ServiceProvider::defaultProviders()->merge([
+    /*
+     * Package Service Providers...
+     */
+    Barryvdh\DomPDF\ServiceProvider::class,
+
+    /*
+     * Application Service Providers...
+     */
+    App\Providers\AppServiceProvider::class,
+    App\Providers\AuthServiceProvider::class,
+    // App\Providers\BroadcastServiceProvider::class,
+    App\Providers\EventServiceProvider::class,
+    App\Providers\RouteServiceProvider::class,
+])->toArray(),
+
+'aliases' => Facade::defaultAliases()->merge([
+    // 'Example' => App\Facades\Example::class,
+    'PDF' => Barryvdh\DomPDF\Facade::class,
+])->toArray(),
 
     'providers' => ServiceProvider::defaultProviders()->merge([
         /*
@@ -181,8 +201,10 @@ return [
     |
     */
 
+
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
+    
 
 ];

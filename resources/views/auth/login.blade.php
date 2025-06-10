@@ -2,19 +2,19 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Login - Mazer Admin Dashboard</title>
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
 
     {{-- CSS --}}
-    <link rel="stylesheet" href="{{ asset('templates/assets/compiled/css/app.css') }}">
-    <link rel="stylesheet" href="{{ asset('templates/assets/compiled/css/app-dark.css') }}">
-    <link rel="stylesheet" href="{{ asset('templates/assets/compiled/css/auth.css') }}">
+    <link rel="stylesheet" href="{{ asset('templates/assets/compiled/css/app.css') }}" />
+    <link rel="stylesheet" href="{{ asset('templates/assets/compiled/css/app-dark.css') }}" />
+    <link rel="stylesheet" href="{{ asset('templates/assets/compiled/css/auth.css') }}" />
 </head>
 
 <body>
-    <script src="{{ asset('assets/static/js/initTheme.js') }}"></script>
+    <script src="{{ asset('templates/assets/static/js/initTheme.js') }}"></script>
 
     <div id="auth">
         <div class="row h-100">
@@ -24,7 +24,7 @@
                     {{-- Logo --}}
                     <div class="auth-logo text-center mb-2">
                         <a href="{{ url('/') }}">
-                            <img src="{{ asset('templates/assets/compiled/jpg/img2.png') }}" alt="Logo" style="width: 100px;">
+                            <img src="{{ asset('templates/assets/compiled/jpg/img2.png') }}" alt="Logo" style="width: 100px;" />
                         </a>
                     </div>
 
@@ -32,10 +32,10 @@
                     <h5 class="auth-title">Masuk</h5>
                     <p class="auth-subtitle mb-3">Selamat Datang di aplikasi monitoring dewan DPC PKB Bengkalis</p>
 
-                    {{-- Error --}}
-                    @if(session('error'))
+                    {{-- Error Messages --}}
+                    @if ($errors->any())
                         <div class="alert alert-danger">
-                            {{ session('error') }}
+                            {{ $errors->first() }}
                         </div>
                     @endif
 
@@ -45,7 +45,7 @@
 
                         {{-- NIK --}}
                         <div class="form-group position-relative has-icon-left mb-4">
-                            <input type="text" name="nik" class="form-control" placeholder="NIK" required autofocus>
+                            <input type="text" name="nik" class="form-control" placeholder="NIK" required autofocus value="{{ old('nik') }}" />
                             <div class="form-control-icon">
                                 <i class="bi bi-person-vcard"></i>
                             </div>
@@ -56,7 +56,7 @@
 
                         {{-- Password --}}
                         <div class="form-group position-relative has-icon-left mb-4">
-                            <input type="password" name="password" class="form-control" placeholder="Password" required>
+                            <input type="password" name="password" class="form-control" placeholder="Password" required />
                             <div class="form-control-icon">
                                 <i class="bi bi-shield-lock"></i>
                             </div>
@@ -67,7 +67,7 @@
 
                         {{-- Remember Me --}}
                         <div class="form-check form-check-lg d-flex align-items-end">
-                            <input class="form-check-input me-2" type="checkbox" name="remember" id="remember">
+                            <input class="form-check-input me-2" type="checkbox" name="remember" id="remember" />
                             <label class="form-check-label text-gray-600" for="remember">
                                 Keep me logged in
                             </label>
@@ -79,7 +79,6 @@
 
                     {{-- Links --}}
                     <div class="text-center mt-5 text-lg">
-                        <p class="text-gray-600">Belum punya akun? <a href="{{ route('register') }}" class="text-success">Daftar</a>.</p>
                         <p><a class="text-success" href="{{ route('password.request') }}">Lupa password?</a>.</p>
                     </div>
 
