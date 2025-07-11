@@ -108,9 +108,9 @@
 
                     @foreach ($stats as $stat)
                         <div class="col-6 col-lg-3 col-md-6">
-                            <div class="d-flex align-items-center bg-light rounded p-3 h-100">
-                                <div class="stats-icon {{ $stat['color'] }} me-3 d-flex align-items-center justify-content-center">
-                                    <i class="bi {{ $stat['icon'] }}"></i>
+                            <div class="d-flex align-items-center gap-5 bg-light rounded p-3 h-100">
+                                <div class="stats-icon {{ $stat['color'] }}">
+                                    <i class="bi {{ $stat['icon'] }} me-2 mb-2"></i>
                                 </div>
                                 <div>
                                     <div class="stats-label">{{ $stat['label'] }}</div>
@@ -127,7 +127,7 @@
                 {{-- Pilihan Grafik --}}
                 <h5 class="mb-3 mt-5">Statistik Data</h5>
                 <div class="chart-selector">
-                    <select id="chartSelect" onchange="switchChart()">
+                    <select class="form-select-sm" style="width: 14%;" id="chartSelect" onchange="switchChart()">
                         <option value="weekly">Per Minggu</option>
                         <option value="monthly">Per Bulan</option>
                         <option value="daily">Per Hari</option>
@@ -357,7 +357,7 @@
     function switchChart() {
         const select = document.getElementById('chartSelect');
         const containers = document.querySelectorAll('.chart-container');
-        
+
         containers.forEach(container => {
             container.classList.remove('active');
         });
