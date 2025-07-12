@@ -22,15 +22,15 @@
                 <div id="auth-left">
 
                     {{-- Logo --}}
-                    <div class="auth-logo text-center mb-2">
-                        <a href="{{ url('/') }}">
-                            <img src="{{ asset('templates/assets/compiled/jpg/img2.png') }}" alt="Logo" style="width: 100px;" />
-                        </a>
-                    </div>
+<div class="text-center mb-2">
+    <img src="{{ asset('templates/assets/compiled/jpg/simoleglogo.png') }}" alt="Logo Besar" style="max-width: 100px; width: 100%; height: auto;" />
+</div>
+
 
                     {{-- Title --}}
                     <h5 class="auth-title">Masuk</h5>
-                    <p class="auth-subtitle mb-3">Selamat Datang di aplikasi monitoring dewan DPC PKB Bengkalis</p>
+                    <p class="auth-subtitle mb-2">Selamat Datang di SIMOLEG</p>
+                    <p class="auth-subtitle mb-3">DPC PKB Bengkalis</p>
 
                     {{-- Error Messages --}}
                     @if ($errors->any())
@@ -74,11 +74,11 @@
                         </div>
 
                         {{-- Submit --}}
-                        <button type="submit" class="btn btn-success btn-block shadow-lg mt-5">Log in</button>
+                        <button type="submit" class="btn btn-success btn-block shadow-lg mt-3">Log in</button>
                     </form>
 
                     {{-- Links --}}
-                    <div class="text-center mt-5 text-lg">
+                    <div class="text-center mt-3 text-lg">
                         <p><a class="text-success" href="{{ route('password.request') }}">Lupa password?</a>.</p>
                     </div>
 
@@ -87,7 +87,12 @@
 
             <div class="col-lg-7 d-none d-lg-block">
                 <div id="auth-right">
-                    {{-- Tambahkan gambar jika perlu --}}
+                    <div id="auth-right">
+    <img src="{{ asset('templates/assets/compiled/jpg/architecture1.jpg') }}" 
+         alt="Ilustrasi Login" 
+         style="width: 100%; height: 100%;" />
+</div>
+
                 </div>
             </div>
         </div>

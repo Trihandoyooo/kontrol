@@ -6,7 +6,7 @@
 </div>
 
 <div class="page-content">
-    <form action="{{ route('admin.iuran.update', $iuran->id) }}" method="POST">
+    <form action="{{ route('admin.iuran.status.update', $iuran->id) }}" method="POST">
         @csrf
         @method('PUT')
         

@@ -191,22 +191,27 @@
                                 <input type="text" name="search" class="form-control" placeholder="Judul atau peserta..." value="{{ request('search') }}">
                             </div>
 
-                            {{-- Tombol Filter --}}
-                            <div class="col-md-1 d-grid">
-                                <button type="submit" class="btn btn-primary">Filter</button>
-                            </div>
+{{-- Tombol Filter --}}
+<div class="col-auto d-grid">
+    <button type="submit" class="btn btn-sm btn-outline-primary">
+        <i class="bi bi-search"></i> Filter
+    </button>
+</div>
 
-                            {{-- Tombol Reset --}}
-                            <div class="col-md-1 d-grid">
-                                <a href="{{ route('kaderisasi.admin.index') }}" class="btn btn-secondary">Reset</a>
-                            </div>
+{{-- Tombol Reset --}}
+<div class="col-auto d-grid">
+    <a href="{{ route('kaderisasi.admin.index') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-clockwise"></i> Reset
+    </a>
+</div>
 
-                            {{-- Tombol Ekspor PDF --}}
-                            <div class="col-md-1 d-grid">
-                                <a href="{{ route('kaderisasi.admin.pdf', request()->query()) }}" class="btn btn-sm btn-danger" title="Ekspor PDF">Ekspor PDF
-                                    <i class="bi bi-file-earmark-pdf"></i>
-                                </a>
-                            </div>
+{{-- Tombol Ekspor PDF --}}
+<div class="col-auto d-grid">
+    <a href="{{ route('kaderisasi.admin.pdf', request()->query()) }}" class="btn btn-sm btn-outline-danger" title="Ekspor PDF">
+        <i class="bi bi-file-earmark-pdf"></i> PDF
+    </a>
+</div>
+
 
                         </div>
                     </form>
@@ -215,41 +220,38 @@
 
             {{-- Table --}}
             <div class="table-responsive">
-                <table class="table table-bordered table-hover align-middle">
+                <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
+                            <th>User</th>
                             <th>Judul</th>
                             <th>Tanggal</th>
                             <th>Peserta</th>
                             <th>Status</th>
-                            <th>User</th>
                             <th style="width: 200px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($kaderisasi as $item)
                         <tr>
+                            <td>{{ $item->user->name ?? '-' }}</td>
                             <td>{{ $item->judul }}</td>
                             <td>{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}</td>
                             <td>{{ $item->peserta }}</td>
                             <td>
-                                <form action="{{ route('kaderisasi.admin.status.update', $item->id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('PUT')
-                                    <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
-                                        <option value="terkirim" {{ $item->status == 'terkirim' ? 'selected' : '' }}>Terkirim</option>
-                                        <option value="diterima" {{ $item->status == 'diterima' ? 'selected' : '' }}>Diterima</option>
-                                        <option value="ditolak" {{ $item->status == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
-                                    </select>
-                                </form>
-                            </td>
-                            <td>{{ $item->user->name ?? '-' }}</td>
+    @php
+        $badgeClass = 'badge-terkirim';
+        if ($item->status === 'diterima') $badgeClass = 'badge-diterima';
+        elseif ($item->status === 'ditolak') $badgeClass = 'badge-ditolak';
+    @endphp
+    <span class="{{ $badgeClass }}">{{ ucfirst($item->status) }}</span>
+</td>
                             <td>
-                                <a href="{{ route('kaderisasi.admin.show', $item->id) }}" class="btn btn-sm btn-info">Detail</a>
+                                <a href="{{ route('kaderisasi.admin.show', $item->id) }}" class="btn btn-outline-info btn-sm me-1"> <i class="bi bi-eye"></i> Detail</a>
                                 <form action="{{ route('kaderisasi.admin.destroy', $item->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-sm btn-danger">
+                                    <button class="btn btn-outline-danger btn-sm me-1">
                                         <i class="bi bi-trash"></i>Hapus</button>
                                 </form>
                             </td>

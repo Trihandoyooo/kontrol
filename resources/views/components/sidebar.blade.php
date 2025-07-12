@@ -1,12 +1,9 @@
 <div id="sidebar" class="active sidebar sidebar bg-light">
     <div class="sidebar-wrapper active">
         <div class="sidebar-header d-flex justify-content-center py-10">
-            <div class="logo" style="padding: 1rem 0; text-align: center;">
-                <a href="index.html">
-                    <img src="templates/assets/compiled/jpg/riza.jpg" alt="Logo" 
-                         style="max-height:150px !important; width:auto !important; display:block; margin:0 auto;">
-                </a>
-            </div>
+<div class="text-center mb-2">
+    <img src="{{ asset('templates/assets/compiled/jpg/simoleglogo.png') }}" alt="Logo Besar" style="max-width: 100px; width: 100%; height: auto;" />
+</div>
         </div>
         <div class="sidebar-menu">
             <ul class="menu list-unstyled">
@@ -64,6 +61,21 @@
                     </a>
                 </li>
                 @endif
+
+                {{-- Menu Outcomes --}}
+<li class="sidebar-item {{ request()->is('outcome*') || request()->is('admin/outcome*') ? 'active' : '' }}">
+    @if(auth()->user() && auth()->user()->role === 'admin')
+        <a href="{{ url('admin/outcome') }}" class="sidebar-link d-flex align-items-center px-3 py-2">
+            <i class="bi bi-award-fill me-2"></i>
+            <span>Outcome</span>
+        </a>
+    @else
+        <a href="{{ url('/outcome') }}" class="sidebar-link d-flex align-items-center px-3 py-2">
+            <i class="bi bi-award-fill me-2"></i>
+            <span>Outcome</span>
+        </a>
+    @endif
+</li>
 
                 {{-- Menu Manajemen Akun (admin only) --}}
                 @if(auth()->user() && auth()->user()->role === 'admin')

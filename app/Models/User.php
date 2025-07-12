@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Rapat;
+use App\Models\Iuran;
+use App\Models\Kaderisasi;
+use App\Models\Outcome;
 
 class User extends Authenticatable
 {
@@ -15,11 +19,16 @@ class User extends Authenticatable
     protected $keyType = 'string';
 
     protected $fillable = [
-        'nik',
-        'name',
-        'email',
-        'role',
-        'password',
+        'nik', 'name', 'email', 'password', 'role',
+        // Data pribadi
+        'nama_lengkap', 'gelar_depan', 'gelar_belakang',
+        'nomor_kta', 'foto_ktp', 'foto_kta','dapil',
+        'tempat_lahir', 'tanggal_lahir', 'usia',
+        'jenis_kelamin', 'agama', 'status_perkawinan','jumlah_suara',
+        'jumlah_suara_sebelumnya',
+
+        // Alamat
+        'alamat_ktp', 'rt', 'rw', 'kecamatan', 'kelurahan', 'kabupaten',
     ];
 
     protected $hidden = [
@@ -31,16 +40,26 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    // Relasi
     public function rapats()
+    {
+        return $this->hasMany(Rapat::class, 'nik', 'nik');
+    }
+
+    public function outcomes()
 {
-    return $this->hasMany(Rapat::class, 'nik', 'nik');
+    return $this->hasMany(Outcome::class, 'nik', 'nik');
 }
 
- public function kaderisasi()
-    {
-        return $this->hasMany(Kaderisasi::class, 'nik', 'nik');
-        // foreign key di kaderisasi = 'nik'
-        // local key di users = 'nik'
-    }
+public function iurans()
+{
+    return $this->hasMany(Iuran::class, 'nik', 'nik');
+}
+
+public function kaderisasis()
+{
+    return $this->hasMany(Kaderisasi::class, 'nik', 'nik');
+}
 
 }

@@ -1,57 +1,137 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="page-heading mb-4">
-    <h3>Detail Rapat</h3>
-</div>
+<style>
+    body {
+        background: #f6f9f8 !important;
+    }
 
-<div class="page-content">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-sm rounded-4">
-                <div class="card-body">
-                    <p><strong>Jenis Rapat:</strong> {{ $rapat->jenis_rapat }}</p>
-                    <p><strong>Judul:</strong> {{ $rapat->judul }}</p>
-                    <p><strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($rapat->tanggal)->format('d M Y') }}</p>
-                    <p><strong>Peserta:</strong> {{ $rapat->peserta }}</p>
-                    <p><strong>Catatan:</strong> {{ $rapat->catatan ?? '-' }}</p>
+    .card-wrapper {
+        max-width: 1400px;
+        margin: 2rem auto;
+        background: #fff;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
 
-                    <p><strong>Dokumentasi:</strong><br>
-                        @if ($rapat->dokumentasi)
-    @php $files = json_decode($rapat->dokumentasi, true); @endphp
-    <ul>
-        @foreach ($files as $file)
-            @php $ext = pathinfo($file, PATHINFO_EXTENSION); @endphp
-            <li class="mb-2">
-                @if (in_array($ext, ['jpg','jpeg','png']))
-                    <img src="{{ asset('storage/' . $file) }}" alt="Dokumentasi" style="max-width: 200px;">
-                @elseif ($ext === 'pdf')
+    .section-title {
+        font-weight: 700;
+        font-size: 1rem;
+        margin: 1.5rem 0 0.75rem;
+        color: #333;
+        padding-bottom: 6px;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table tr {
+        border-bottom: 1px dashed #ccc;
+    }
+
+    .data-label {
+        width: 200px;
+        padding: 8px 0;
+        font-weight: 600;
+        color: #444;
+        text-align: left;
+        vertical-align: top;
+        position: relative;
+        padding-right: 20px;
+    }
+
+    .data-label::after {
+        content: ":";
+        position: absolute;
+        right: 8px;
+    }
+
+    .data-value {
+        padding: 8px 0;
+        color: #222;
+    }
+
+    .thumbnail {
+        width: 120px;
+        height: 80px;
+        object-fit: cover;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        transition: 0.3s;
+    }
+
+    .thumbnail:hover {
+        transform: scale(1.03);
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+</style>
+
+<div class="card-wrapper">
+    <h4>Detail Rapat</h4>
+    <p class="text-muted mb-4">Menampilkan detail kegiatan rapat yang Anda kirimkan.</p>
+
+    {{-- Informasi --}}
+    <div class="section-title">Informasi Rapat</div>
+    <table class="data-table mb-1">
+        <tr><td class="data-label">Judul</td><td class="data-value">{{ $rapat->judul }}</td></tr>
+        <tr><td class="data-label">Jenis Rapat</td><td class="data-value">{{ $rapat->jenis_rapat }}</td></tr>
+        <tr><td class="data-label">Tanggal</td><td class="data-value">{{ \Carbon\Carbon::parse($rapat->tanggal)->format('d-m-Y') }}</td></tr>
+        <tr><td class="data-label">Peserta</td><td class="data-value">{{ $rapat->peserta }}</td></tr>
+        <tr><td class="data-label">Catatan</td><td class="data-value">{{ $rapat->catatan ?? '-' }}</td></tr>
+        <tr>
+            <td class="data-label">Status</td>
+            <td class="data-value">
+                @php
+                    $badge = 'bg-warning text-dark';
+                    if ($rapat->status === 'diterima') $badge = 'bg-success';
+                    elseif ($rapat->status === 'ditolak') $badge = 'bg-danger';
+                @endphp
+                <span class="badge {{ $badge }}">{{ ucfirst($rapat->status) }}</span>
+            </td>
+        </tr>
+    </table>
+
+    {{-- Alasan Penolakan --}}
+    @if($rapat->status === 'ditolak' && $rapat->alasan_tolak)
+        <div class="alert alert-danger">
+            <strong>Alasan Penolakan:</strong><br>
+            {{ $rapat->alasan_tolak }}
+        </div>
+    @endif
+
+    {{-- Dokumentasi --}}
+    @if($rapat->dokumentasi)
+        <div class="section-title">Dokumentasi</div>
+        <div class="d-flex flex-wrap gap-3 mb-4">
+            @foreach(json_decode($rapat->dokumentasi) as $file)
+                @php $ext = pathinfo($file, PATHINFO_EXTENSION); @endphp
+                @if(in_array($ext, ['jpg','jpeg','png','webp']))
+                    <a href="{{ asset('storage/' . $file) }}" target="_blank">
+                        <img src="{{ asset('storage/' . $file) }}" alt="Dokumentasi" class="thumbnail">
+                    </a>
+                @elseif($ext === 'pdf')
                     <a href="{{ asset('storage/' . $file) }}" target="_blank" class="btn btn-outline-primary btn-sm">Lihat PDF</a>
                 @else
                     <a href="{{ asset('storage/' . $file) }}" target="_blank" class="btn btn-outline-secondary btn-sm">Download File</a>
                 @endif
-            </li>
-        @endforeach
-    </ul>
-@else
-    <p>Tidak ada dokumentasi.</p>
-@endif
+            @endforeach
+        </div>
+    @endif
 
-
-                    <div class="d-flex justify-content-between">
-                        <a href="{{ route('rapat.user.index') }}" class="btn btn-secondary">← Kembali</a>
-                        <div>
-                            <a href="{{ route('rapat.user.edit', $rapat->id) }}" class="btn btn-warning">Edit</a>
-                            <form action="{{ route('rapat.user.destroy', $rapat->id) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger" onclick="return confirm('Yakin ingin menghapus rapat ini?')">Hapus</button>
-                            </form>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
+    {{-- Aksi --}}
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{{ route('rapat.user.index') }}" class="btn btn-secondary">← Kembali</a>
+        <div>
+            <a href="{{ route('rapat.user.edit', $rapat->id) }}" class="btn btn-warning">Edit</a>
+            <form action="{{ route('rapat.user.destroy', $rapat->id) }}" method="POST" style="display:inline;">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Yakin ingin menghapus rapat ini?')">Hapus</button>
+            </form>
         </div>
     </div>
 </div>

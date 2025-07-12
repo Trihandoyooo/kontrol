@@ -7,10 +7,6 @@
     }
 </style>
 
-<div class="page-heading mb-4">
-    <h3>Input Rapat Baru</h3> 
-</div>
-
 <div class="page-content">
     <div class="row justify-content-center">
         <div class="col-md-12">
@@ -30,6 +26,8 @@
                         @csrf
 
                         <div class="mb-3">
+            <h2>Input Rapat Baru</h2>
+            <p class="text-subtitle text-muted">Berikut merupakan form yang dapat bapak/ibu isi untuk dapat menambahkan rapat.</p>
                             <label for="jenis_rapat" class="form-label">Jenis Rapat</label>
                             <select name="jenis_rapat" class="form-select" required>
                                 <option value="">-- Pilih Jenis Rapat --</option>
@@ -38,6 +36,10 @@
                                 <option value="rapat fraksi" {{ old('jenis_rapat') == 'rapat fraksi' ? 'selected' : '' }}>Rapat Fraksi</option>
                                 <option value="rapat lintas komisi" {{ old('jenis_rapat') == 'rapat lintas komisi' ? 'selected' : '' }}>Rapat Lintas Komisi</option>
                                 <option value="rapat kelengkapan dewan" {{ old('jenis_rapat') == 'rapat kelengkapan dewan' ? 'selected' : '' }}>Rapat Kelengkapan Dewan</option>
+                                <option value="rapat fraksi" {{ old('jenis_rapat') == 'rapat fraksi' ? 'selected' : '' }}>Rapat Fraksi</option>
+                                <option value="rapat acara dengan DPC PKB Bengkalis" {{ old('jenis_rapat') == 'rapat acara dengan DPC PKB Bengkalis' ? 'selected' : '' }}>Rapat/Acara dengan DPC PKB Bengkalis</option>
+                                <option value="rapat acara dengan DPW PKB" {{ old('jenis_rapat') == 'rapat acara dengan DPW PKB' ? 'selected' : '' }}>Rapat/Acara dengan DPW PKB</option>
+                                <option value="rapat acara dengan DPP PKB" {{ old('jenis_rapat') == 'rapat acara dengan DPP PKB' ? 'selected' : '' }}>Rapat/Acara dengan DPP PKB</option>
                                 <option value="rapat lainnya" {{ old('jenis_rapat') == 'rapat lainnya' ? 'selected' : '' }}>Rapat Lainnya</option>
                             </select>
                         </div>

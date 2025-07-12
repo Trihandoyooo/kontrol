@@ -3,80 +3,84 @@
 namespace App\Http\Controllers;
 
 use App\Models\Rapat;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Support\Facades\DB;
 
 class RapatController extends Controller
 {
     public function index(Request $request)
-{
-    $user = Auth::user();
-    $userNik = $user->nik;
+    {
+        $user = Auth::user();
+        $search = $request->input('search');
+        $statusFilter = $request->input('status');
+        $tanggalDari = $request->input('tanggal_dari');
+        $tanggalSampai = $request->input('tanggal_sampai');
 
-    $search = $request->input('search');
-    $statusFilter = $request->input('status');
+        if ($user->role === 'admin') {
+            $users = User::all();
 
-    $query = Rapat::where('nik', $userNik)
-                  ->whereIn('status', ['diterima', 'ditolak']);
+            $query = DB::table('rapats')
+                ->join('users', 'users.nik', '=', 'rapats.nik')
+                ->select('rapats.*', 'users.name as user_name');
 
-    if ($search) {
-        $query->where(function($q) use ($search) {
-            $q->where('judul', 'like', "%{$search}%")
-              ->orWhere('jenis_rapat', 'like', "%{$search}%")
-              ->orWhere('peserta', 'like', "%{$search}%");
-        });
-    }
-
-    if ($statusFilter) {
-        $query->where('status', $statusFilter);
-    }
-
-    if ($request->has('export') && $request->export == 'csv') {
-        $rapats = $query->orderBy('tanggal', 'desc')->get();
-
-        $response = new StreamedResponse(function() use ($rapats) {
-            $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['Jenis Rapat', 'Judul', 'Tanggal', 'Peserta', 'Status', 'Catatan']);
-
-            foreach ($rapats as $rapat) {
-                fputcsv($handle, [
-                    ucfirst($rapat->jenis_rapat),
-                    $rapat->judul,
-                    $rapat->tanggal,
-                    $rapat->peserta,
-                    $rapat->status,
-                    $rapat->catatan,
-                ]);
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('rapats.judul', 'like', "%{$search}%")
+                      ->orWhere('rapats.jenis_rapat', 'like', "%{$search}%")
+                      ->orWhere('rapats.peserta', 'like', "%{$search}%")
+                      ->orWhere('rapats.status', 'like', "%{$search}%")
+                      ->orWhere('users.name', 'like', "%{$search}%");
+                });
             }
-            fclose($handle);
-        });
 
-        $response->headers->set('Content-Type', 'text/csv');
-        $response->headers->set('Content-Disposition', 'attachment; filename="rapat.csv"');
+            if ($statusFilter) {
+                $query->where('rapats.status', $statusFilter);
+            }
 
-        return $response;
+            if ($request->filled('nik')) {
+                $query->where('rapats.nik', $request->nik);
+            }
+
+            if ($tanggalDari && $tanggalSampai) {
+                $query->whereBetween('rapats.tanggal', [$tanggalDari, $tanggalSampai]);
+            }
+
+            $rapats = $query->orderBy('rapats.tanggal', 'desc')->paginate(10);
+
+            return view('rapat.admin.index', compact('users', 'rapats', 'search', 'statusFilter', 'tanggalDari', 'tanggalSampai'));
+        } else {
+            $nik = $user->nik;
+
+            $query = Rapat::where('nik', $nik);
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('judul', 'like', "%{$search}%")
+                      ->orWhere('jenis_rapat', 'like', "%{$search}%")
+                      ->orWhere('peserta', 'like', "%{$search}%")
+                      ->orWhere('status', 'like', "%{$search}%");
+                });
+            }
+
+            if ($statusFilter) {
+                $query->where('status', $statusFilter);
+            }
+
+            if ($tanggalDari && $tanggalSampai) {
+                $query->whereBetween('tanggal', [$tanggalDari, $tanggalSampai]);
+            }
+
+            $rapats = $query->orderBy('tanggal', 'desc')->paginate(10);
+
+            $rapatsMenunggu = $rapats->where('status', 'terkirim');
+            $rapatsVerifikasi = $rapats->whereIn('status', ['diterima', 'ditolak']);
+
+            return view('rapat.user.index', compact('rapats', 'rapatsMenunggu', 'rapatsVerifikasi', 'search', 'statusFilter', 'tanggalDari', 'tanggalSampai'));
+        }
     }
-
-    $rapats = $query->orderBy('tanggal', 'desc')->get();
-
-    $rapatsMenunggu = Rapat::where('nik', $userNik)
-                           ->where('status', 'terkirim')
-                           ->orderBy('created_at', 'desc')
-                           ->get();
-
-    // Tambahan data grafik untuk admin
-    $chartData = null;
-    if ($user->role === 'admin') {
-        $chartData = Rapat::selectRaw('status, COUNT(*) as total')
-                          ->groupBy('status')
-                          ->pluck('total', 'status')
-                          ->toArray();
-    }
-
-    return view('rapat.user.index', compact('rapats', 'rapatsMenunggu', 'search', 'statusFilter', 'chartData'));
-}
 
     public function create()
     {
@@ -91,28 +95,32 @@ class RapatController extends Controller
             'tanggal' => 'required|date',
             'peserta' => 'required|string|max:255',
             'dokumentasi.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-            'catatan' => 'nullable|string',
+            'notulen' => 'nullable|string',
         ]);
 
         $validated['nik'] = Auth::user()->nik;
+        $validated['status'] = 'terkirim';
 
-        $paths = [];
         if ($request->hasFile('dokumentasi')) {
+            $paths = [];
             foreach ($request->file('dokumentasi') as $file) {
                 $paths[] = $file->store('dokumentasi_rapat', 'public');
             }
+            $validated['dokumentasi'] = json_encode($paths);
         }
-        $validated['dokumentasi'] = json_encode($paths);
 
         Rapat::create($validated);
 
-        return redirect()->route('rapat.user.index')->with('success', 'Data rapat berhasil ditambahkan.');
+        return redirect()->route('rapat.user.index')->with('success', 'Data rapat berhasil ditambahkan dan menunggu verifikasi.');
     }
 
     public function show($id)
     {
-        $userNik = auth()->user()->nik;
-        $rapat = Rapat::where('id', $id)->where('nik', $userNik)->firstOrFail();
+        $rapat = Rapat::findOrFail($id);
+
+        if (Auth::user()->role !== 'admin' && $rapat->nik !== Auth::user()->nik) {
+            abort(403);
+        }
 
         return view('rapat.user.show', compact('rapat'));
     }
@@ -129,41 +137,68 @@ class RapatController extends Controller
             'jenis_rapat' => 'required|string',
             'judul' => 'required|string|max:255',
             'tanggal' => 'required|date',
-            'peserta' => 'required|string|max:255',
+            'peserta' => 'nullable|string|max:255',
+            'notulen' => 'nullable|string',
             'dokumentasi.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-            'catatan' => 'nullable|string',
         ]);
 
         $rapat = Rapat::where('nik', Auth::user()->nik)->findOrFail($id);
 
-        $existing = json_decode($rapat->dokumentasi, true) ?? [];
+        $existingFiles = json_decode($rapat->dokumentasi, true) ?? [];
 
         if ($request->hasFile('dokumentasi')) {
             foreach ($request->file('dokumentasi') as $file) {
-                $existing[] = $file->store('dokumentasi_rapat', 'public');
+                $existingFiles[] = $file->store('dokumentasi_rapat', 'public');
             }
         }
 
-        $validated['dokumentasi'] = count($existing) ? json_encode($existing) : null;
+        $updateData = [
+            'jenis_rapat' => $validated['jenis_rapat'],
+            'judul' => $validated['judul'],
+            'tanggal' => $validated['tanggal'],
+            'peserta' => $validated['peserta'] ?? null,
+            'notulen' => $validated['notulen'] ?? null,
+            'dokumentasi' => count($existingFiles) ? json_encode($existingFiles) : null,
+            'status' => 'terkirim',
+            'alasan_tolak' => null,
+        ];
 
-        $rapat->update($validated);
+        $rapat->update($updateData);
 
-        return redirect()->route('rapat.user.index')->with('success', 'Data rapat berhasil diperbarui');
+        return redirect()->route('rapat.user.index')->with('success', 'Data rapat berhasil diperbarui dan dikirim ulang untuk verifikasi.');
+    }
+
+    public function deleteFile($id, $index)
+    {
+        $rapat = Rapat::where('nik', Auth::user()->nik)->findOrFail($id);
+
+        $files = json_decode($rapat->dokumentasi, true) ?? [];
+
+        if (isset($files[$index])) {
+            Storage::disk('public')->delete($files[$index]);
+            unset($files[$index]);
+            $rapat->dokumentasi = count($files) ? json_encode(array_values($files)) : null;
+            $rapat->save();
+        }
+
+        return back()->with('success', 'File dokumentasi berhasil dihapus.');
     }
 
     public function destroy($id)
     {
         $rapat = Rapat::where('nik', Auth::user()->nik)->findOrFail($id);
 
-        $files = json_decode($rapat->dokumentasi, true);
-        if ($files) {
+        if ($rapat->dokumentasi) {
+            $files = json_decode($rapat->dokumentasi, true);
             foreach ($files as $file) {
-                Storage::disk('public')->delete($file);
+                if (Storage::disk('public')->exists($file)) {
+                    Storage::disk('public')->delete($file);
+                }
             }
         }
 
         $rapat->delete();
 
-        return redirect()->route('rapat.user.index')->with('success', 'Data rapat berhasil dihapus');
+        return redirect()->route('rapat.user.index')->with('success', 'Data rapat berhasil dihapus.');
     }
 }

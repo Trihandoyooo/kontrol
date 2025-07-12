@@ -4,35 +4,64 @@ namespace App\Http\Controllers;
 
 use App\Models\Kaderisasi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class KaderisasiController extends Controller
 {
     public function index(Request $request)
     {
-        $userNik = auth()->user()->nik;
+        $user = Auth::user();
         $search = $request->input('search');
+        $statusFilter = $request->input('status');
 
-        // Kaderisasi yang sudah diverifikasi (diterima atau ditolak)
-        $query = Kaderisasi::where('nik', $userNik)
-            ->whereIn('status', ['diterima', 'ditolak']);
+        // Data Menunggu Verifikasi
+        $kaderisasisMenunggu = DB::table('kaderisasi')
+            ->join('users', 'users.nik', '=', 'kaderisasi.nik')
+            ->select('kaderisasi.*', 'users.name as user_name')
+            ->when($user->role !== 'admin', fn($q) => $q->where('kaderisasi.nik', $user->nik))
+            ->when($search, function ($q) use ($search, $user) {
+                $q->where(function ($query) use ($search, $user) {
+                    $query->where('kaderisasi.judul', 'like', "%{$search}%")
+                          ->orWhere('kaderisasi.peserta', 'like', "%{$search}%")
+                          ->orWhere('kaderisasi.status', 'like', "%{$search}%");
+                    if ($user->role === 'admin') {
+                        $query->orWhere('users.name', 'like', "%{$search}%");
+                    }
+                });
+            })
+            ->where('kaderisasi.status', 'terkirim')
+            ->orderBy('kaderisasi.tanggal', 'desc')
+            ->get();
+
+        // Data Riwayat (Diterima/Ditolak)
+        $query = DB::table('kaderisasi')
+            ->join('users', 'users.nik', '=', 'kaderisasi.nik')
+            ->select('kaderisasi.*', 'users.name as user_name')
+            ->whereIn('kaderisasi.status', ['diterima', 'ditolak']);
+
+        if ($user->role !== 'admin') {
+            $query->where('kaderisasi.nik', $user->nik);
+        }
 
         if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('judul', 'like', '%' . $search . '%')
-                  ->orWhere('peserta', 'like', '%' . $search . '%')
-                  ->orWhere('status', 'like', '%' . $search . '%');
+            $query->where(function ($q) use ($search, $user) {
+                $q->where('kaderisasi.judul', 'like', "%{$search}%")
+                  ->orWhere('kaderisasi.peserta', 'like', "%{$search}%")
+                  ->orWhere('kaderisasi.status', 'like', "%{$search}%");
+                if ($user->role === 'admin') {
+                    $q->orWhere('users.name', 'like', "%{$search}%");
+                }
             });
         }
 
-        $kaderisasis = $query->orderBy('tanggal', 'desc')->paginate(10);
+        if ($statusFilter) {
+            $query->where('kaderisasi.status', $statusFilter);
+        }
 
-        // Kaderisasi yang belum diverifikasi (status = terkirim)
-        $kaderisasisMenunggu = Kaderisasi::where('nik', $userNik)
-            ->where('status', 'terkirim')
-            ->orderBy('tanggal', 'desc')
-            ->get();
+        $kaderisasis = $query->orderBy('kaderisasi.tanggal', 'desc')->paginate(10);
 
-        return view('kaderisasi.user.index', compact('kaderisasis', 'search', 'kaderisasisMenunggu'));
+        return view('kaderisasi.user.index', compact('kaderisasis', 'kaderisasisMenunggu', 'search', 'statusFilter'));
     }
 
     public function create()
@@ -46,7 +75,7 @@ class KaderisasiController extends Controller
             'nik' => 'required|string|max:20',
             'judul' => 'required|string|max:255',
             'tanggal' => 'required|date',
-            'dokumentasi.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf',
+            'dokumentasi.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'peserta' => 'nullable|string',
             'catatan' => 'nullable|string',
             'status' => 'required|in:terkirim,diterima,ditolak',
@@ -59,6 +88,7 @@ class KaderisasiController extends Controller
                 $files[] = $file->store('kaderisasi_dokumentasi', 'public');
             }
         }
+
         $validated['dokumentasi'] = json_encode($files);
 
         Kaderisasi::create($validated);
@@ -78,18 +108,19 @@ class KaderisasiController extends Controller
 
     public function update(Request $request, Kaderisasi $kaderisasi)
     {
+        if ($kaderisasi->nik !== Auth::user()->nik) {
+            abort(403);
+        }
+
         $validated = $request->validate([
-            'nik' => 'required|string|max:20',
             'judul' => 'required|string|max:255',
             'tanggal' => 'required|date',
-            'dokumentasi.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf',
             'peserta' => 'nullable|string',
             'catatan' => 'nullable|string',
-            'status' => 'required|in:terkirim,diterima,ditolak',
-            'alasan_tolak' => 'nullable|string',
+            'dokumentasi.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
-        $existingFiles = json_decode($kaderisasi->dokumentasi) ?: [];
+        $existingFiles = json_decode($kaderisasi->dokumentasi, true) ?? [];
         $newFiles = [];
 
         if ($request->hasFile('dokumentasi')) {
@@ -98,41 +129,40 @@ class KaderisasiController extends Controller
             }
         }
 
-        $allFiles = array_merge($existingFiles, $newFiles);
-        $validated['dokumentasi'] = json_encode($allFiles);
+        $combinedFiles = array_merge($existingFiles, $newFiles);
+        $validated['dokumentasi'] = count($combinedFiles) ? json_encode($combinedFiles) : null;
+
+        if ($kaderisasi->status === 'ditolak') {
+            $validated['status'] = 'terkirim';
+            $validated['alasan_tolak'] = null;
+        }
 
         $kaderisasi->update($validated);
 
         return redirect()->route('kaderisasi.user.index')->with('success', 'Data kaderisasi berhasil diperbarui.');
     }
 
-    public function updateStatus(Request $request, $id)
+    public function deleteFile($id, $index)
     {
-        $kaderisasi = Kaderisasi::findOrFail($id);
+        $kaderisasi = Kaderisasi::where('nik', auth()->user()->nik)->findOrFail($id);
+        $files = json_decode($kaderisasi->dokumentasi, true) ?? [];
 
-        $request->validate([
-            'status' => 'required|in:terkirim,diterima,ditolak',
-            'catatan' => 'nullable|string',
-        ]);
+        if (isset($files[$index])) {
+            if (\Storage::disk('public')->exists($files[$index])) {
+                \Storage::disk('public')->delete($files[$index]);
+            }
 
-        $kaderisasi->status = $request->input('status');
-
-        if ($request->input('status') === 'ditolak') {
-            $kaderisasi->alasan_tolak = $request->input('catatan');
-            $kaderisasi->catatan = null;
-        } else {
-            $kaderisasi->alasan_tolak = null;
-            $kaderisasi->catatan = $request->input('catatan');
+            unset($files[$index]);
+            $kaderisasi->dokumentasi = count($files) ? json_encode(array_values($files)) : null;
+            $kaderisasi->save();
         }
 
-        $kaderisasi->save();
-
-        return redirect()->route('admin.kaderisasi.index')->with('success', 'Status kaderisasi berhasil diperbarui.');
+        return back()->with('success', 'Satu dokumentasi berhasil dihapus.');
     }
 
     public function destroy(Kaderisasi $kaderisasi)
     {
-        $files = json_decode($kaderisasi->dokumentasi);
+        $files = json_decode($kaderisasi->dokumentasi, true);
         if ($files) {
             foreach ($files as $file) {
                 if (\Storage::disk('public')->exists($file)) {
@@ -144,53 +174,5 @@ class KaderisasiController extends Controller
         $kaderisasi->delete();
 
         return redirect()->route('kaderisasi.user.index')->with('success', 'Data kaderisasi berhasil dihapus.');
-    }
-
-    // Fitur export CSV
-    public function export(Request $request)
-    {
-        $search = $request->input('search');
-
-        $query = Kaderisasi::where('status', '!=', 'menunggu'); // exclude status menunggu
-
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('judul', 'like', '%' . $search . '%')
-                  ->orWhere('peserta', 'like', '%' . $search . '%')
-                  ->orWhere('status', 'like', '%' . $search . '%');
-            });
-        }
-
-        $kaderisasis = $query->orderBy('tanggal', 'desc')->get();
-
-        $filename = "riwayat_kaderisasi_" . date('Ymd_His') . ".csv";
-
-        $headers = [
-            "Content-type"        => "text/csv",
-            "Content-Disposition" => "attachment; filename={$filename}",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
-        ];
-
-        $columns = ['Tanggal', 'Peserta', 'Status', 'Catatan'];
-
-        $callback = function () use ($kaderisasis, $columns) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, $columns);
-
-            foreach ($kaderisasis as $item) {
-                fputcsv($file, [
-                    $item->judul,
-                    $item->tanggal,
-                    $item->peserta,
-                    $item->status,
-                ]);
-            }
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
     }
 }

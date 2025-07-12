@@ -27,13 +27,17 @@ class KaderisasiAdminController extends Controller
         }
 
         // Search di judul dan peserta
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search){
-                $q->where('judul', 'like', "%$search%")
-                  ->orWhere('peserta', 'like', "%$search%");
-            });
-        }
+if ($request->filled('search')) {
+    $search = $request->search;
+    $query->where(function ($q) use ($search) {
+        $q->where('judul', 'like', "%$search%")
+          ->orWhere('peserta', 'like', "%$search%")
+          ->orWhereHas('user', function ($uq) use ($search) {
+              $uq->where('name', 'like', "%$search%")
+                 ->orWhere('nik', 'like', "%$search%");
+          });
+    });
+}
 
         $kaderisasi = $query->paginate(10)->withQueryString();
 
@@ -62,13 +66,17 @@ class KaderisasiAdminController extends Controller
         $query->where('tanggal', '<=', $request->tanggal_sampai);
     }
 
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function ($q) use ($search) {
-            $q->where('judul', 'like', "%$search%")
-              ->orWhere('peserta', 'like', "%$search%");
-        });
-    }
+if ($request->filled('search')) {
+    $search = $request->search;
+    $query->where(function ($q) use ($search) {
+        $q->where('judul', 'like', "%$search%")
+          ->orWhere('peserta', 'like', "%$search%")
+          ->orWhereHas('user', function ($uq) use ($search) {
+              $uq->where('name', 'like', "%$search%")
+                 ->orWhere('nik', 'like', "%$search%");
+          });
+    });
+}
 
     $kaderisasi = $query->get();
 

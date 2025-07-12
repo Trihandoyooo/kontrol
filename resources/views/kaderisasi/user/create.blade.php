@@ -12,10 +12,11 @@
         <div class="col-md-12">
             <div class="card shadow-sm rounded-10">
                 <div class="card-body">
-            <h2 class="card-title mb-4">Tambah Iuran</h2>
-            <p class="text-subtitle text-muted">
-                Berikut merupakan bagian yang harus diisi untuk melampirkan iuran yang telah bapak/ibu lakukan
-            </p> 
+                    <h2 class="card-title mb-4">Tambah Kaderisasi</h2>
+                    <p class="text-subtitle text-muted">
+                        Silakan lengkapi informasi berikut untuk menambahkan data kaderisasi.
+                    </p> 
+
                     @if ($errors->any())
                         <div class="alert alert-danger rounded-3">
                             <ul class="mb-0">
@@ -29,36 +30,35 @@
                     <form action="{{ route('kaderisasi.user.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
-    <input type="hidden" name="nik" value="{{ auth()->user()->nik }}">
-    <input type="hidden" name="status" value="terkirim">
+                        <input type="hidden" name="nik" value="{{ auth()->user()->nik }}">
+                        <input type="hidden" name="status" value="terkirim">
 
                         <div class="mb-3">
-                            <label for="judul" class="form-label">Judul Kegiatan<span class="text-danger">*</label>
+                            <label for="judul" class="form-label">Judul Kaderisasi <span class="text-danger">*</span></label>
                             <input type="text" name="judul" class="form-control" required value="{{ old('judul') }}">
                         </div>
 
                         <div class="mb-3">
-                            <label for="tanggal" class="form-label">Tanggal<span class="text-danger">*</label>
+                            <label for="tanggal" class="form-label">Tanggal <span class="text-danger">*</span></label>
                             <input type="date" name="tanggal" class="form-control" required value="{{ old('tanggal') }}">
                         </div>
 
                         <div class="mb-3">
-                            <label for="peserta" class="form-label">Peserta<span class="text-danger">*</label>
-                            <input type="text" name="peserta" class="form-control" required value="{{ old('peserta') }}">
+                            <label for="peserta" class="form-label">Peserta Kaderisasi</label>
+                            <textarea name="peserta" class="form-control" rows="3">{{ old('peserta') }}</textarea>
                         </div>
-
-<div class="mb-3">
-    <label for="dokumentasi" class="form-label">Dokumentasi <span class="text-danger">*</span></label>
-    <input type="file" name="dokumentasi[]" class="form-control" multiple id="dokumentasi-input" required>
-</div>
-
-
-                        <div id="dokumentasi-preview" class="mb-3"></div>
 
                         <div class="mb-3">
-                            <label for="catatan" class="form-label">Catatan (Opsional)</label>
+                            <label for="catatan" class="form-label">Catatan</label>
                             <textarea name="catatan" class="form-control" rows="3">{{ old('catatan') }}</textarea>
                         </div>
+
+                        <div class="mb-3">
+                            <label for="foto" class="form-label">Dokumentasi (Foto) <span class="text-danger">*</span></label>
+                            <input type="file" name="foto[]" class="form-control" multiple id="foto-input" required>
+                        </div>
+
+                        <div id="foto-preview" class="mb-3"></div>
 
                         <div class="d-grid">
                             <button type="submit" class="btn btn-success btn-lg">Simpan Kaderisasi</button>
@@ -71,8 +71,8 @@
 </div>
 
 <script>
-    document.getElementById('dokumentasi-input').addEventListener('change', function(){
-        const preview = document.getElementById('dokumentasi-preview');
+    document.getElementById('foto-input').addEventListener('change', function(){
+        const preview = document.getElementById('foto-preview');
         preview.innerHTML = '';
         const files = this.files;
         if(files.length === 0) return;

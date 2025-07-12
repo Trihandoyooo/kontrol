@@ -9,9 +9,47 @@ use Illuminate\Support\Facades\Hash;
 
 class UserManagementController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
+        $query = User::query();
+
+        // Filter pencarian
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                  ->orWhere('nik', 'like', "%$search%")
+                  ->orWhere('email', 'like', "%$search%");
+            });
+        }
+
+        // Filter role
+        if ($request->filled('role') && $request->role !== 'all') {
+            $query->where('role', $request->role);
+        }
+
+        // Ambil semua kontribusi (tanpa filter status)
+        $users = $query->select('users.*')
+            ->withCount([
+                'rapats as total_rapat' => function ($q) {
+                    $q->selectRaw('count(*)')->whereColumn('rapats.nik', 'users.nik');
+                },
+                'iurans as total_iuran' => function ($q) {
+                    $q->selectRaw('count(*)')->whereColumn('iurans.nik', 'users.nik');
+                },
+                'kaderisasis as total_kaderisasi' => function ($q) {
+                    $q->selectRaw('count(*)')->whereColumn('kaderisasis.nik', 'users.nik');
+                },
+                'outcomes as total_outcome' => function ($q) {
+                    $q->selectRaw('count(*)')->whereColumn('outcomes.nik', 'users.nik');
+                },
+            ])
+            ->with([
+                'rapats', 'iurans', 'kaderisasis', 'outcomes' // Ini buat modal
+            ])
+            ->orderBy('name')
+            ->paginate(10);
+
         return view('admin.users.index', compact('users'));
     }
 

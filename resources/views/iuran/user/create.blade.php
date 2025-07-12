@@ -1,6 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
+
+<style>
+    body {
+        background: rgb(239, 248, 243) !important; /* Putih kehijauan */
+    }
+</style>
 <div class="container mt-2">
     <div class="row justify-content-center">
         <div class="col-md-12">
@@ -56,7 +62,7 @@
 
                         <div class="mb-3">
                             <label for="dokumentasi" class="form-label">Upload Dokumentasi (Opsional)</label>
-                            <input type="file" name="dokumentasi" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
+                            <input type="file" name="dokumentasi[]" class="form-control" accept=".jpg,.jpeg,.png,.pdf" multiple>
                         </div>
 
                         <div class="d-grid">
