@@ -39,7 +39,7 @@
     }
 </style>
 
-<div class="container mt-4">
+<div class="mt-4">
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body">
 
@@ -160,9 +160,9 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="badge 
-                                        {{ $kaderisasi->status == 'terkirim' ? 'badge-terkirim' : 
-                                           ($kaderisasi->status == 'diterima' ? 'badge-diterima' : 
+                                    <span class="badge
+                                        {{ $kaderisasi->status == 'terkirim' ? 'badge-terkirim' :
+                                           ($kaderisasi->status == 'diterima' ? 'badge-diterima' :
                                            ($kaderisasi->status == 'ditolak' ? 'badge-ditolak' : '') ) }}">
                                         {{ ucfirst($kaderisasi->status) }}
                                     </span>

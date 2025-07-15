@@ -1,23 +1,27 @@
-<div id="sidebar" class="active sidebar sidebar bg-light">
+<div id="sidebar">
     <div class="sidebar-wrapper active">
         <div class="sidebar-header d-flex justify-content-center py-10">
-<div class="text-center mb-2">
-    <img src="{{ asset('templates/assets/compiled/jpg/simoleglogo.png') }}" alt="Logo Besar" style="max-width: 100px; width: 100%; height: auto;" />
-</div>
+            <div class="text-center mb-2">
+                <img src="{{ asset('templates/assets/compiled/jpg/simoleglogo.png') }}" alt="Logo Besar"
+                    style="max-width: 100px; width: 100%; height: auto;" />
+            </div>
+            <div class="sidebar-toggler x">
+                <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+            </div>
         </div>
         <div class="sidebar-menu">
             <ul class="menu list-unstyled">
-                    
-                <li class="sidebar-item {{ request()->is('dashboard') ? 'active' : '' }}">
+
+                <li class="sidebar-item {{ request()->is('dashboard') || request()->is('admin/home') || request()->is('user/home')  ? 'active' : '' }}">
                     <a href="{{ url('/dashboard') }}" class="sidebar-link d-flex align-items-center px-3 py-2">
                         <i class="bi bi-grid-fill me-2"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
-                
+
                 {{-- Menu Rapat dan Koordinasi --}}
                 <li class="sidebar-item {{ request()->is('rapat*') || request()->is('admin/rapat*') ? 'active' : '' }}">
-                    @if(auth()->user() && auth()->user()->role === 'admin')
+                    @if (auth()->user() && auth()->user()->role === 'admin')
                         <a href="{{ url('admin/rapat') }}" class="sidebar-link d-flex align-items-center px-3 py-2">
                             <i class="bi bi-stack me-2"></i>
                             <span>Rapat dan Koordinasi</span>
@@ -32,7 +36,7 @@
 
                 {{-- Menu Iuran --}}
                 <li class="sidebar-item {{ request()->is('iuran*') || request()->is('admin/iuran*') ? 'active' : '' }}">
-                        @if(auth()->user() && auth()->user()->role === 'admin')
+                    @if (auth()->user() && auth()->user()->role === 'admin')
                         <a href="{{ url('admin/iuran') }}" class="sidebar-link d-flex align-items-center px-3 py-2">
                             <i class="bi bi-cash me-2"></i>
                             <span>Iuran</span>
@@ -47,9 +51,11 @@
                 </li>
 
                 {{-- Menu Kaderisasi --}}
-                        <li class="sidebar-item {{ request()->is('kaderisasi*') || request()->is('admin/kaderisasi*') ? 'active' : '' }}">
-                        @if(auth()->user() && auth()->user()->role === 'admin')
-                        <a href="{{ url('admin/kaderisasi') }}" class="sidebar-link d-flex align-items-center px-3 py-2">
+                <li
+                    class="sidebar-item {{ request()->is('kaderisasi*') || request()->is('admin/kaderisasi*') ? 'active' : '' }}">
+                    @if (auth()->user() && auth()->user()->role === 'admin')
+                        <a href="{{ url('admin/kaderisasi') }}"
+                            class="sidebar-link d-flex align-items-center px-3 py-2">
                             <i class="bi bi-person-badge-fill me-2"></i>
                             <span>Kaderisasi</span>
                         </a>
@@ -63,24 +69,26 @@
                 @endif
 
                 {{-- Menu Outcomes --}}
-<li class="sidebar-item {{ request()->is('outcome*') || request()->is('admin/outcome*') ? 'active' : '' }}">
-    @if(auth()->user() && auth()->user()->role === 'admin')
-        <a href="{{ url('admin/outcome') }}" class="sidebar-link d-flex align-items-center px-3 py-2">
-            <i class="bi bi-award-fill me-2"></i>
-            <span>Outcome</span>
-        </a>
-    @else
-        <a href="{{ url('/outcome') }}" class="sidebar-link d-flex align-items-center px-3 py-2">
-            <i class="bi bi-award-fill me-2"></i>
-            <span>Outcome</span>
-        </a>
-    @endif
-</li>
+                <li
+                    class="sidebar-item {{ request()->is('outcome*') || request()->is('admin/outcome*') ? 'active' : '' }}">
+                    @if (auth()->user() && auth()->user()->role === 'admin')
+                        <a href="{{ url('admin/outcome') }}" class="sidebar-link d-flex align-items-center px-3 py-2">
+                            <i class="bi bi-award-fill me-2"></i>
+                            <span>Outcome</span>
+                        </a>
+                    @else
+                        <a href="{{ url('/outcome') }}" class="sidebar-link d-flex align-items-center px-3 py-2">
+                            <i class="bi bi-award-fill me-2"></i>
+                            <span>Outcome</span>
+                        </a>
+                    @endif
+                </li>
 
                 {{-- Menu Manajemen Akun (admin only) --}}
-                @if(auth()->user() && auth()->user()->role === 'admin')
+                @if (auth()->user() && auth()->user()->role === 'admin')
                     <li class="sidebar-item {{ request()->is('admin/users*') ? 'active' : '' }}">
-                        <a href="{{ route('admin.users.index') }}" class="sidebar-link d-flex align-items-center px-3 py-2">
+                        <a href="{{ route('admin.users.index') }}"
+                            class="sidebar-link d-flex align-items-center px-3 py-2">
                             <i class="bi bi-person-lock me-2"></i>
                             <span>Manajemen Akun</span>
                         </a>
@@ -88,18 +96,37 @@
                 @endif
 
                 {{-- Logout --}}
-                <li class="sidebar-item">
-                    <form method="POST" action="{{ route('logout') }}" id="logout-form">
+                {{-- <li class="sidebar-item">
+                    <form method="POST" action="{{ route('logout') }}" id="logout-form" onsubmit="return confirm('Yakin ingin keluar ?')">
                         @csrf
-                        <a href="#" 
-                           class="sidebar-link d-flex align-items-center px-3 py-2"
-                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <a href="#" class="sidebar-link d-flex align-items-center px-3 py-2"
+                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                             <i class="bi bi-box-arrow-right me-2"></i>
                             <span>Logout</span>
                         </a>
                     </form>
+                </li> --}}
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link d-flex align-items-center px-3 py-2"
+                    onclick="event.preventDefault(); handleLogout();">
+                        <i class="bi bi-box-arrow-right me-2"></i>
+                        <span>Logout</span>
+                    </a>
+
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                        @csrf
+                    </form>
                 </li>
 
+                @push('scripts')
+                <script>
+                    function handleLogout() {
+                        if (confirm('Yakin ingin keluar?')) {
+                            document.getElementById('logout-form').submit();
+                        }
+                    }
+                </script>
+                @endpush
             </ul>
         </div>
     </div>

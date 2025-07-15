@@ -34,13 +34,23 @@
     .badge-diterima { background-color: #198754; color: white; }
     .badge-ditolak { background-color: #dc3545; color: white; }
     .table th, .table td { vertical-align: middle; }
+
+    .card-container {
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 128, 0, 0.1);
+            padding: 1.5rem 2rem 2.5rem 2rem;
+            background: #ffffff;
+            margin-bottom: 4rem;
+        }
 </style>
 
-<div class="container mt-0">
-    <div class="card shadow-sm border-0 mb-4">
+<div class="mt-4">
+    <div class="card-container shadow-sm border-0 mb-4">
         <div class="card-body">
-            <h2>Data Rapat</h2>
-            <p class="text-subtitle text-muted">Berikut merupakan daftar rapat dari seluruh pengguna. Admin dapat memverifikasi dan menghapus data di sini.</p>
+            <div class="page-heading mb-3">
+                <h3>Data Rapat</h3>
+                <p>Berikut merupakan daftar rapat dari seluruh pengguna. Admin dapat memverifikasi dan menghapus data di sini.</p>
+            </div>
 
             <!-- Filter Form -->
             <div class="card mb-4">
@@ -140,7 +150,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center">Tidak ada data rapat.</td>
+                            <td colspan="7" class="text-center">Tidak ada data rapat.</td>
                         </tr>
                         @endforelse
                     </tbody>

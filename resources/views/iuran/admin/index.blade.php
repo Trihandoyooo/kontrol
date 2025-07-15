@@ -6,22 +6,7 @@
     body {
         background: #f2f7f5 !important;
     }
-    .card-container {
-        border-radius: 16px;
-        box-shadow: 0 8px 20px rgba(0, 128, 0, 0.1);
-        padding: 1.5rem 2rem 2.5rem 2rem;
-        background: linear-gradient(145deg, #ffffff, #e6f4ea);
-        margin-bottom: 2rem;
-    }
-    .nav-tabs .nav-link {
-        color: rgb(40, 142, 47);
-        font-weight: 600;
-        border-radius: 10px;
-    }
-    .nav-tabs .nav-link.active {
-        background-color: #198754;
-        color: white;
-    }
+
     .tab-pane h2, .tab-pane h3, .tab-pane h5 {
         color: #1b5e20;
     }
@@ -48,7 +33,7 @@
     }
 </style>
 
-<div class="container mt-3">
+<div class="mt-3">
     <div class="card-container">
 
         <!-- Tabs -->
@@ -245,13 +230,13 @@
                             </div>
 
                             <div class="col-auto d-grid">
-                                <button type="submit" class="btn btn-sm btn-outline-primary"><i class="bi bi-search"></i> Filter</button>
+                                <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i> Filter</button>
                             </div>
                             <div class="col-auto d-grid">
-                                <a href="{{ route('admin.iuran.index') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i> Reset</a>
+                                <a href="{{ route('admin.iuran.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i> Reset</a>
                             </div>
                             <div class="col-auto d-grid">
-                                <a href="{{ route('admin.iuran.pdf', request()->query()) }}" class="btn btn-sm btn-outline-danger" title="Ekspor PDF"><i class="bi bi-file-earmark-pdf"></i> PDF</a>
+                                <a href="{{ route('admin.iuran.pdf', request()->query()) }}" class="btn btn-outline-danger" title="Ekspor PDF"><i class="bi bi-file-earmark-pdf"></i> PDF</a>
                             </div>
                         </div>
                     </form>

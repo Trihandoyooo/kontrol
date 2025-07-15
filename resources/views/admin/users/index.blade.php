@@ -35,7 +35,7 @@
     }
 </style>
 
-<div class="page-content">
+<div class="page-content mt-4">
     <section class="row">
         <div class="col-12">
             @if(session('success'))
@@ -45,13 +45,17 @@
                 </div>
             @endif
 
-            <div class="card shadow-sm border-0 mb-2">
-                <div class="card-body">
+            <div class="card-container shadow-sm border-0 mb-2">
+                {{-- <div class="card-body">
                     <h2 class="card-title mb-2">Manajemen User</h2>
                     <p class="text-muted mb-0">Halaman untuk melihat dan mengelola akun user yang terdaftar dalam sistem.</p>
-                </div>
+                </div> --}}
 
                 <div class="card-body">
+                    <div class="page-heading mb-3">
+                        <h3>Manajemen User</h3>
+                        <p>Halaman untuk melihat dan mengelola akun user yang terdaftar dalam sistem.</p>
+                    </div>
                     <form method="GET" action="{{ route('admin.users.index') }}">
                         <div class="row align-items-end border-bottom pb-3 mb-4">
                             <div class="col-md-3">

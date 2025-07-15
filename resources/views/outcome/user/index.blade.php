@@ -39,7 +39,7 @@
     }
 </style>
 
-<div class="container mt-4">
+<div class="mt-4">
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body">
 
@@ -153,9 +153,9 @@
                                 <td>{{ $outcome->dapil }}</td>
                                 <td>{{ \Illuminate\Support\Str::limit($outcome->manfaat, 50) }}</td>
                                 <td>
-                                    <span class="badge 
-                                        {{ $outcome->status == 'terkirim' ? 'badge-terkirim' : 
-                                           ($outcome->status == 'diterima' ? 'badge-diterima' : 
+                                    <span class="badge
+                                        {{ $outcome->status == 'terkirim' ? 'badge-terkirim' :
+                                           ($outcome->status == 'diterima' ? 'badge-diterima' :
                                            ($outcome->status == 'ditolak' ? 'badge-ditolak' : '')) }}">
                                         {{ ucfirst($outcome->status) }}
                                     </span>

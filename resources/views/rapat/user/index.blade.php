@@ -60,7 +60,7 @@
     }
 </style>
 
-<div class="container mt-4">
+<div class="mt-4">
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body">
 
@@ -177,7 +177,7 @@
                                     <td>{{ \Carbon\Carbon::parse($rapat->tanggal)->format('d-m-Y') }}</td>
                                     <td>{{ $rapat->peserta ?? '-' }}</td>
                                     <td>
-                                        <span class="badge 
+                                        <span class="badge
                                             {{ $rapat->status == 'terkirim' ? 'badge-terkirim' :
                                                ($rapat->status == 'diterima' ? 'badge-diterima' :
                                                ($rapat->status == 'ditolak' ? 'badge-ditolak' : '')) }}">

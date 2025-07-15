@@ -27,7 +27,7 @@
     <style>
         /* Sidebar dasar */
         #sidebar {
-            width: 250px;
+            /* width: 250px; */
             position: fixed;
             top: 0;
             left: 0;
@@ -36,6 +36,29 @@
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
             transition: margin-left 0.3s ease-in-out;
             z-index: 100;
+        }
+
+        .card-container {
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 128, 0, 0.1);
+            padding: 1.5rem 2rem 2.5rem 2rem;
+            background: #ffffff;
+            margin-bottom: 4rem;
+        }
+
+        .nav-tabs .nav-link {
+            color: rgb(40, 142, 47);
+            font-weight: 600;
+            border-radius: 10px 10px 0px 0px;
+        }
+
+        .nav-tabs .nav-link.active {
+            background-color: #198754;
+            color: white;
+        }
+
+        .nav-tabs .nav-link.active:after {
+            background-color: #198754;
         }
 
         /* Sidebar sembunyi */
@@ -79,6 +102,7 @@
         }
 
         @media (max-width: 768px) {
+
             /* Sidebar default sembunyi di mobile */
             #sidebar {
                 margin-left: -250px;
@@ -115,7 +139,9 @@
 
             <div id="main">
                 {{-- Header --}}
-                </header>
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
 
                 {{-- Konten halaman --}}
                 <div class="page">
@@ -132,8 +158,9 @@
                     <a class="navbar-brand" href="{{ url('/') }}">
                         {{ config('app.name', 'Laravel') }}
                     </a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                         <span class="navbar-toggler-icon"></span>
                     </button>
 
@@ -196,7 +223,7 @@
     @stack('scripts')
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const toggleButton = document.getElementById('sidebarToggle');
             toggleButton?.addEventListener('click', () => {
                 document.getElementById('app').classList.toggle('sidebar-hidden');

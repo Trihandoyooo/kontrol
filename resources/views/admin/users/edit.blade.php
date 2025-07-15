@@ -7,7 +7,7 @@
     }
 </style>
 
-<div class="container mt-0">
+<div class="mt-0">
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body">
 
