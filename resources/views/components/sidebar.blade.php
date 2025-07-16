@@ -12,7 +12,7 @@
         <div class="sidebar-menu">
             <ul class="menu list-unstyled">
 
-                <li class="sidebar-item {{ request()->is('dashboard') || request()->is('admin/home') || request()->is('user/home')  ? 'active' : '' }}">
+                <li class="sidebar-item {{ request()->is('dashboard') || request()->is('admin/home') || request()->is('user/home') || request()->is('ketua/home')  ? 'active' : '' }}">
                     <a href="{{ url('/dashboard') }}" class="sidebar-link d-flex align-items-center px-3 py-2">
                         <i class="bi bi-grid-fill me-2"></i>
                         <span>Dashboard</span>

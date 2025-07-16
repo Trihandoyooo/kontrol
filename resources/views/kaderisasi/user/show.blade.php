@@ -70,9 +70,11 @@
     }
 </style>
 
-<div class="card-wrapper">
-    <h4>Detail Kegiatan Kaderisasi</h4>
-    <p class="text-muted mb-4">Menampilkan detail kaderisasi yang telah Anda kirimkan.</p>
+<div class="card-container mt-4">
+    <div class="page-heading mb-3">
+        <h3>Detail Kegiatan Kaderisasi</h3>
+        <p class="text-muted mb-4">Menampilkan detail kaderisasi yang telah Anda kirimkan.</p>
+    </div>
 
     {{-- Informasi --}}
     <div class="section-title">Informasi Kegiatan</div>

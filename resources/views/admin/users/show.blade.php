@@ -22,6 +22,7 @@
         position: absolute;
         top: 20px;
         right: 20px;
+        z-index: 10;
     }
 
     .left-panel {
@@ -37,6 +38,8 @@
         height: auto;
         border-radius: 10px;
         border: 1px solid #ccc;
+        object-fit: cover;
+        max-width: 220px;
     }
 
     .dprd-info-card {
@@ -103,28 +106,71 @@
     .data-value {
         padding: 8px 0;
         color: #222;
+        word-break: break-word;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 992px) {
         .profile-wrapper {
             flex-direction: column;
+            padding: 1.2rem;
+            gap: 1.2rem;
         }
-
-        .left-panel,
-        .right-panel {
+        .btn-back {
+            position: static;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        .left-panel {
             width: 100%;
+            align-items: flex-start;
+            flex-direction: row;
+            gap: 1.2rem;
         }
+        .left-panel img {
+            max-width: 120px;
+        }
+        .dprd-info-card {
+            margin-top: 0;
+            flex: 1;
+        }
+    }
 
+    @media (max-width: 600px) {
+        .profile-wrapper {
+            padding: 0.5rem;
+        }
+        .left-panel {
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .left-panel img {
+            max-width: 100px;
+        }
+        .dprd-info-card {
+            width: 100%;
+            padding: 0.7rem;
+        }
+        .section-title {
+            font-size: 0.98rem;
+            margin: 1rem 0 0.5rem;
+        }
         .data-label {
-            width: 150px;
+            width: 110px;
+            font-size: 0.95rem;
+            padding-right: 10px;
+        }
+        .data-value {
+            font-size: 0.95rem;
         }
     }
 </style>
 
-<div class="container">
+<div class="container mt-4">
     <div class="profile-wrapper">
         <a href="{{ route('admin.users.index') }}" class="btn btn-secondary btn-sm btn-back">
-            <i class="bi bi-arrow-left-circle"></i> Kembali
+            <i class="bi bi-arrow-left-circle mb-2"></i>
+            <span>Kembali</span>
         </a>
 
         <div class="left-panel">

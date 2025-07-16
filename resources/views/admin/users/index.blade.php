@@ -194,29 +194,75 @@
                     <!-- Modal Kontribusi -->
                     <div class="modal fade" id="modalKontribusi{{ $user->nik }}" tabindex="-1" aria-labelledby="kontribusiLabel{{ $user->nik }}" aria-hidden="true">
                         <div class="modal-dialog modal-lg modal-dialog-centered">
-                            <div class="modal-content rounded-4">
-                                <div class="modal-header bg-light">
-                                    <h5 class="modal-title" id="kontribusiLabel{{ $user->nik }}">Detail Kontribusi: {{ $user->name }}</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                            <div class="modal-content rounded-4 shadow">
+                                <div class="modal-header bg-gradient rounded-4">
+                                    <h5 class="modal-title" id="kontribusiLabel{{ $user->nik }}">
+                                        <i class="bi bi-bar-chart-line me-2"></i> Detail Kontribusi: {{ $user->name }}
+                                    </h5>
+                                    <button type="button" class="btn-close " data-bs-dismiss="modal" aria-label="Tutup"></button>
                                 </div>
-                                <div class="modal-body">
+                                <div class="modal-body bg-light">
                                     <div class="row">
                                         <div class="col-md-5 border-end">
-                                            <p><strong>NIK:</strong> {{ $user->nik }}</p>
-                                            <p><strong>Email:</strong> {{ $user->email ?? '-' }}</p>
-                                            <p><strong>Dapil:</strong> {{ $user->dapil ?? '-' }}</p>
-                                            <p><strong>Jumlah Suara:</strong> {{ $user->jumlah_suara ?? '0' }}</p>
+                                            <h6 class="mb-3 text-primary"><i class="bi bi-person-badge me-1"></i> Info User</h6>
+                                            <div class="mb-2"><strong>NIK:</strong> <span class="text-dark">{{ $user->nik }}</span></div>
+                                            <div class="mb-2"><strong>Email:</strong> <span class="text-dark">{{ $user->email ?? '-' }}</span></div>
+                                            <div class="mb-2"><strong>Dapil:</strong> <span class="text-dark">{{ $user->dapil ?? '-' }}</span></div>
+                                            <div class="mb-2"><strong>Jumlah Suara:</strong> <span class="badge bg-success fs-6">{{ $user->jumlah_suara ?? '0' }}</span></div>
                                         </div>
                                         <div class="col-md-7">
-                                            <p><strong>Total Rapat:</strong> {{ $user->rapats->count() }} kegiatan</p>
-                                            <p><strong>Total Iuran:</strong> {{ $user->iurans->count() }} kali</p>
-                                            <p><strong>Total Kaderisasi:</strong> {{ $user->kaderisasis->count() }} kegiatan</p>
-                                            <p><strong>Total Outcome:</strong> {{ $user->outcomes->count() }} data</p>
-                                            <div class="mt-2">
-                                                <a href="{{ route('admin.rapat.index') }}?search={{ $user->name }}" class="btn btn-sm btn-outline-danger me-1 mb-1">Lihat Rapat</a>
-                                                <a href="{{ route('admin.iuran.index') }}?search={{ $user->name }}" class="btn btn-sm btn-outline-success me-1 mb-1">Lihat Iuran</a>
-                                                <a href="{{ route('kaderisasi.admin.index') }}?search={{ $user->name }}" class="btn btn-sm btn-outline-warning me-1 mb-1">Lihat Kaderisasi</a>
-                                                <a href="{{ route('admin.outcome.index') }}?search={{ $user->name }}" class="btn btn-sm btn-outline-primary me-1 mb-1">Lihat Outcome</a>
+                                            <h6 class="mb-3 text-primary"><i class="bi bi-graph-up-arrow me-1"></i> Statistik Kontribusi</h6>
+                                            <div class="row g-2 mb-2">
+                                                <div class="col-6">
+                                                    <div class="p-2 bg-white rounded shadow-sm d-flex align-items-center">
+                                                        <i class="bi bi-people-fill text-danger fs-4 me-2"></i>
+                                                        <div>
+                                                            <div class="fw-bold">{{ $user->rapats->count() }}</div>
+                                                            <small class="text-muted">Total Rapat</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="p-2 bg-white rounded shadow-sm d-flex align-items-center">
+                                                        <i class="bi bi-cash-coin text-success fs-4 me-2"></i>
+                                                        <div>
+                                                            <div class="fw-bold">{{ $user->iurans->count() }}</div>
+                                                            <small class="text-muted">Total Iuran</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="p-2 bg-white rounded shadow-sm d-flex align-items-center">
+                                                        <i class="bi bi-person-lines-fill text-warning fs-4 me-2"></i>
+                                                        <div>
+                                                            <div class="fw-bold">{{ $user->kaderisasis->count() }}</div>
+                                                            <small class="text-muted">Total Kaderisasi</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="p-2 bg-white rounded shadow-sm d-flex align-items-center">
+                                                        <i class="bi bi-bar-chart-fill text-primary fs-4 me-2"></i>
+                                                        <div>
+                                                            <div class="fw-bold">{{ $user->outcomes->count() }}</div>
+                                                            <small class="text-muted">Total Outcome</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mt-3 d-flex flex-wrap gap-2">
+                                                <a href="{{ route('admin.rapat.index') }}?search={{ $user->name }}" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-calendar-event"></i> Lihat Rapat
+                                                </a>
+                                                <a href="{{ route('admin.iuran.index') }}?search={{ $user->name }}" class="btn btn-sm btn-outline-success">
+                                                    <i class="bi bi-cash-stack"></i> Lihat Iuran
+                                                </a>
+                                                <a href="{{ route('kaderisasi.admin.index') }}?search={{ $user->name }}" class="btn btn-sm btn-outline-warning">
+                                                    <i class="bi bi-person-lines-fill"></i> Lihat Kaderisasi
+                                                </a>
+                                                <a href="{{ route('admin.outcome.index') }}?search={{ $user->name }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-bar-chart"></i> Lihat Outcome
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
@@ -226,7 +272,6 @@
                     </div>
                 @endif
             @endforeach
-
         </div>
     </section>
 </div>

@@ -7,15 +7,15 @@
     }
 </style>
 
-<div class="mt-0">
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body">
-
-            <h2>Edit Data User</h2>
+<div class="mt-4">
+    <div class="card-container">
+        <div class="page-heading mb-3">
+            <h3>Edit Data User</h3>
             <p class="text-subtitle text-muted">
                 Berikut merupakan data user yang bisa anda edit di sini.
             </p>
-
+        </div>
+        <div class="card-body">
             @if ($errors->any())
                 <div class="alert alert-danger">
                     <ul class="mb-0">
@@ -202,7 +202,7 @@
                     <input type="password" name="password_confirmation" class="form-control">
                 </div>
 
-                <button type="submit" class="btn btn-outline-success">Update</button>
+                <button type="submit" class="btn btn-outline-success me-1">Update</button>
                 <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">Batal</a>
             </form>
         </div>

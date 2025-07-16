@@ -15,13 +15,15 @@
     }
 </style>
 
-<div class="mt-3">
+<div class="mt-4">
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <div class="card shadow-sm rounded-4">
-                <div class="card-body">
-                    <h2 class="card-title">Edit Rapat</h2>
+            <div class="card-container shadow-sm rounded-4">
+                <div class="page-heading mb-3">
+                    <h3 class="card-title">Edit Rapat</h3>
                     <p class="text-muted">Silakan ubah informasi rapat sesuai kebutuhan.</p>
+                </div>
+                <div class="card-body">
 
                     {{-- Dokumentasi lama (DI LUAR form utama) --}}
                     @if($rapat->dokumentasi)

@@ -105,9 +105,8 @@
     }
 </style>
 
-<div id="main">
-    <div class="card p-4">
-
+<div id="main" class="mt-4">
+    <div class="card-container p-4">
         {{-- Profil --}}
         <div class="row align-items-center mb-3">
             <div class="col-md-3 text-center">

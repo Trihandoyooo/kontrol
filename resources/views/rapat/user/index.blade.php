@@ -61,57 +61,57 @@
 </style>
 
 <div class="mt-4">
-    <div class="card shadow-sm border-0 mb-4">
+    <div class="card-container shadow-sm border-0 mb-4">
+        <div class="page-heading mb-3">
+            <h3 class="mb-1">Rapat Anda</h3>
+            <p class="text-muted mb-0">Berikut merupakan informasi rapat yang telah bapak/ibu inputkan.</p>
+        </div>
         <div class="card-body">
-
-            {{-- Header --}}
-            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                <div>
-                    <h2 class="mb-1">Rapat Anda</h2>
-                    <p class="text-muted mb-0">Berikut merupakan informasi rapat yang telah bapak/ibu inputkan.</p>
-                </div>
-                <a href="{{ route('rapat.user.create') }}" class="btn btn-outline-success">
-                    <i class="bi bi-plus-lg"></i> Tambah Rapat
-                </a>
-            </div>
-
             {{-- Flash Success --}}
             @if(session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
 
-            {{-- Search + Filter --}}
-            <form method="GET" class="mb-3">
-                <div class="row g-2 align-items-center">
-                    <div class="col-md-4">
-                        <input type="text" name="search" value="{{ request('search') }}" class="form-control"
-                            placeholder="Cari judul, jenis rapat, peserta...">
+            {{-- Header --}}
+            <div class="d-flex justify-content-between my-3 align-items-center mb-3 flex-wrap gap-5">
+                <a href="{{ route('rapat.user.create') }}" class="btn btn-outline-success flex-shrink-0 mb-2 mb-md-0">
+                    <i class="bi bi-plus-lg"></i> Tambah Rapat
+                </a>
+                {{-- Search + Filter --}}
+                <form method="GET" class="flex-grow-1">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-12 col-md-5 flex-grow-1">
+                            <input type="text" name="search" value="{{ request('search') }}" class="form-control"
+                                placeholder="Cari judul, jenis rapat, peserta...">
+                        </div>
+                        <div class="col-12 col-md-4 flex-grow-1">
+                            <select name="status" class="form-select">
+                                <option value="">Filter Status</option>
+                                <option value="terkirim" {{ request('status') == 'terkirim' ? 'selected' : '' }}>Terkirim</option>
+                                <option value="diterima" {{ request('status') == 'diterima' ? 'selected' : '' }}>Diterima</option>
+                                <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                            </select>
+                        </div>
+                        <div class="col-auto flex-shrink-0">
+                            <button class="btn btn-success w-100">
+                                <i class="bi bi-search"></i> Cari
+                            </button>
+                        </div>
+                        <div class="col-auto flex-shrink-0">
+                            <a href="{{ route('rapat.user.index') }}" class="btn btn-secondary w-100">
+                                <i class="bi bi-x-circle"></i> Reset
+                            </a>
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        <select name="status" class="form-select">
-                            <option value="">Filter Status</option>
-                            <option value="terkirim" {{ request('status') == 'terkirim' ? 'selected' : '' }}>Terkirim</option>
-                            <option value="diterima" {{ request('status') == 'diterima' ? 'selected' : '' }}>Diterima</option>
-                            <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-success w-100">
-                            <i class="bi bi-search"></i> Cari
-                        </button>
-                    </div>
-                    <div class="col-md-2">
-                        <a href="{{ route('rapat.user.index') }}" class="btn btn-secondary w-100">
-                            <i class="bi bi-x-circle"></i> Reset
-                        </a>
-                    </div>
-                </div>
-            </form>
+                </form>
+            </div>
 
             {{-- Rapat Menunggu Verifikasi --}}
             @if($rapatsMenunggu->isNotEmpty())
-                <div class="mb-5">
-                    <h4 class="mb-3">Menunggu Verifikasi</h4>
+                <div class="my-5">
+                    <div class="page-heading my-3">
+                        <h3 class="mb-3">Menunggu Verifikasi</h3>
+                    </div>
                     <div class="card shadow-sm border-0">
                         <div class="card-body table-responsive">
                             <table class="table table-hover">
@@ -153,7 +153,9 @@
             @endif
 
             {{-- Riwayat Rapat Disetujui / Ditolak --}}
-            <h4 class="mb-3">Rapat Disetujui / Ditolak</h4>
+            <div class="page-heading mb-3">
+                <h3>Rapat Disetujui / Ditolak</h3>
+            </div>
             <div class="card shadow-sm border-0">
                 <div class="card-body table-responsive">
                     <table class="table table-hover">
@@ -198,16 +200,16 @@
                                     </td>
                                     <td>{{ $rapat->catatan ?? '-' }}</td>
                                     <td class="text-center">
-                                        <a href="{{ route('rapat.user.show', $rapat->id) }}" class="btn btn-sm btn-outline-info mb-1">
+                                        <a href="{{ route('rapat.user.show', $rapat->id) }}" class="btn btn-sm btn-outline-info">
                                             <i class="bi bi-eye"></i> Detail
                                         </a>
-                                        <a href="{{ route('rapat.user.edit', $rapat->id) }}" class="btn btn-sm btn-outline-warning mb-1">
+                                        <a href="{{ route('rapat.user.edit', $rapat->id) }}" class="btn btn-sm btn-outline-warning">
                                             <i class="bi bi-pencil-square"></i> Edit
                                         </a>
                                         <form action="{{ route('rapat.user.destroy', $rapat->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin hapus?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="btn btn-sm btn-outline-danger mb-1">
+                                            <button class="btn btn-sm btn-outline-danger">
                                                 <i class="bi bi-trash"></i> Hapus
                                             </button>
                                         </form>

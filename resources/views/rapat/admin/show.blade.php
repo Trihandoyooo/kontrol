@@ -70,9 +70,11 @@
     }
 </style>
 
-<div class="card-wrapper">
-    <h4>Detail Rapat</h4>
-    <p class="text-muted mb-4">Menampilkan detail kegiatan rapat dan status verifikasi.</p>
+<div class="card-container mt-4">
+    <div class="page-heading mb-3">
+        <h3>Detail Rapat</h3>
+        <p class="text-muted mb-4">Menampilkan detail kegiatan rapat dan status verifikasi.</p>
+    </div>
 
     {{-- Informasi --}}
     <div class="section-title">Informasi Rapat</div>

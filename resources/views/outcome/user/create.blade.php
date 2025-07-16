@@ -7,15 +7,17 @@
     }
 </style>
 
-<div class="page-content">
+<div class="page-content mt-4">
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <div class="card shadow-sm rounded-10">
-                <div class="card-body">
-                    <h2 class="card-title mb-4">Tambah Outcome</h2>
-                    <p class="text-subtitle text-muted">
+            <div class="card-container shadow-sm rounded-10">
+                <div class="page-heading mb-3">
+                    <h3 class="card-title">Tambah Outcome</h3>
+                    <p class="text-muted my-1">
                         Silakan lengkapi informasi berikut untuk menambahkan outcome/output kegiatan.
-                    </p> 
+                    </p>
+                </div>
+                <div class="card-body">
 
                     @if ($errors->any())
                         <div class="alert alert-danger rounded-3">
@@ -76,7 +78,7 @@
                         <div id="dokumentasi-preview" class="mb-3"></div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-success btn-lg">Simpan Outcome</button>
+                            <button type="submit" class="btn btn-success">Simpan Outcome</button>
                         </div>
                     </form>
                 </div>

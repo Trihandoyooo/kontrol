@@ -34,47 +34,47 @@
 </style>
 
 <div class="mt-4">
-    <div class="card shadow-sm border-0 mb-4">
+    <div class="card-container shadow-sm border-0 mb-4">
         <div class="card-body">
-
-            {{-- Header dan Tombol Tambah --}}
-            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                <div>
-                    <h2 class="mb-1">Iuran Anda</h2>
-                    <p class="text-muted mb-0">Berikut merupakan informasi untuk iuran yang bapak/ibu telah lakukan.</p>
-                </div>
-                <a href="{{ route('iuran.user.create') }}" class="btn btn-outline-success">
-                    <i class="bi bi-plus-circle"></i> Tambah Iuran
-                </a>
+            <div class="page-heading mb-3">
+                <h3 class="mb-1">Iuran Anda</h3>
+                <p class="text-muted mb-0">Berikut merupakan informasi untuk iuran yang bapak/ibu telah lakukan.</p>
             </div>
 
-            {{-- Search dan Filter --}}
-            <form method="GET" class="mb-3">
-                <div class="row g-2 align-items-center">
-                    <div class="col-md-4">
-                        <input type="text" name="search" value="{{ request('search') }}" class="form-control"
-                            placeholder="Cari jenis iuran, catatan, status...">
+            {{-- Header dan Tombol Tambah --}}
+            <div class="d-flex justify-content-between my-3 align-items-center flex-wrap gap-5">
+                <a href="{{ route('iuran.user.create') }}" class="btn btn-outline-success flex-shrink-0 mb-2 mb-md-0">
+                    <i class="bi bi-plus-circle"></i> Tambah Iuran
+                </a>
+                {{-- Search dan Filter --}}
+                <form method="GET" class="flex-grow-1">
+                    <div class="row g-2 align-items-center flex-nowrap">
+                        <div class="col-12 col-md-5 flex-grow-1">
+                            <input type="text" name="search" value="{{ request('search') }}" class="form-control"
+                                placeholder="Cari jenis iuran, catatan, status...">
+                        </div>
+                        <div class="col-12 col-md-4 flex-grow-1">
+                            <select name="status" class="form-select">
+                                <option value="">Filter Status</option>
+                                <option value="terkirim" {{ request('status') == 'terkirim' ? 'selected' : '' }}>Terkirim</option>
+                                <option value="diterima" {{ request('status') == 'diterima' ? 'selected' : '' }}>Diterima</option>
+                                <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                            </select>
+                        </div>
+                        <div class="col-auto flex-shrink-0">
+                            <button class="btn btn-success w-100">
+                                <i class="bi bi-search"></i> Cari
+                            </button>
+                        </div>
+                        <div class="col-auto flex-shrink-0">
+                            <a href="{{ route('iuran.user.index') }}" class="btn btn-secondary w-100">
+                                <i class="bi bi-x-circle"></i> Reset
+                            </a>
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        <select name="status" class="form-select">
-                            <option value="">Filter Status</option>
-                            <option value="terkirim" {{ request('status') == 'terkirim' ? 'selected' : '' }}>Terkirim</option>
-                            <option value="diterima" {{ request('status') == 'diterima' ? 'selected' : '' }}>Diterima</option>
-                            <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-success w-100">
-                            <i class="bi bi-search"></i> Cari
-                        </button>
-                    </div>
-                    <div class="col-md-2">
-                        <a href="{{ route('iuran.user.index') }}" class="btn btn-secondary w-100">
-                            <i class="bi bi-x-circle"></i> Reset
-                        </a>
-                    </div>
-                </div>
-            </form>
+                </form>
+            </div>
+
 
             {{-- Total Iuran Disetujui --}}
             <div class="alert bg-success text-white fw-bold d-flex justify-content-between align-items-center shadow-sm rounded-3 px-4 py-3 mb-4">
@@ -85,13 +85,15 @@
             </div>
 
             {{-- Progress Per Kategori --}}
-            <h4 class="mb-3">Progress Per Kategori</h4>
+            <div class="page-heading">
+                <h3>Progress Per Kategori</h3>
+            </div>
             <div class="overflow-auto pb-2">
                 <div class="d-flex flex-row gap-3" style="min-width: 600px;">
                     @foreach($progressPerKategori as $kategori => $data)
                         <div class="card border-0 shadow-sm flex-shrink-0" style="min-width: 250px;">
                             <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="d-flex justify-content-between align-items-center mb-2 gap-3">
                                     <h6 class="mb-0 text-truncate" title="{{ $kategori }}">{{ $kategori }}</h6>
                                     <span class="badge bg-success">{{ $data['persentase'] }}%</span>
                                 </div>
@@ -156,7 +158,9 @@
             @endif
 
             {{-- Tabel Iuran Diterima --}}
-            <h4 class="mb-3">Iuran Disetujui</h4>
+            <div class="page-heading mb-3">
+                <h3>Iuran Disetujui</h3>
+            </div>
             <div class="card shadow-sm border-0">
                 <div class="card-body table-responsive">
                     <table class="table table-hover">

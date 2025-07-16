@@ -40,42 +40,42 @@
 </style>
 
 <div class="mt-4">
-    <div class="card shadow-sm border-0 mb-4">
+    <div class="card-container shadow-sm border-0 mb-4">
         <div class="card-body">
-
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <h2 class="mb-1">Data Kaderisasi Anda</h2>
-                    <p class="text-muted mb-0">Berikut merupakan data kaderisasi yang telah Anda laporkan.</p>
-                </div>
-                <a href="{{ route('kaderisasi.user.create') }}" class="btn btn-outline-success">
-                    <i class="bi bi-plus-lg"></i> Tambah Kaderisasi
-                </a>
+            <div class="page-heading mb-3">
+                <h3 class="mb-1">Data Kaderisasi Anda</h3>
+                <p class="text-muted mb-0">Berikut merupakan data kaderisasi yang telah Anda laporkan.</p>
             </div>
 
-            {{-- Search & Filter --}}
-            <form method="GET" action="{{ route('kaderisasi.user.index') }}" class="mb-4">
-                <div class="row g-2 align-items-center">
-                    <div class="col-md-4">
-                        <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Cari judul atau peserta...">
+            <div class="d-flex flex-wrap justify-content-between align-items-center my-3 gap-5">
+                <a href="{{ route('kaderisasi.user.create') }}" class="btn btn-outline-success flex-shrink-0 mb-2 mb-md-0">
+                    <i class="bi bi-plus-lg"></i> Tambah Kaderisasi
+                </a>
+                {{-- Search & Filter --}}
+                <form method="GET" action="{{ route('kaderisasi.user.index') }}" class="flex-grow-1">
+                    <div class="row g-2 align-items-center flex-nowrap">
+                        <div class="col-12 col-md-5 flex-grow-1">
+                            <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Cari judul atau peserta...">
+                        </div>
+                        <div class="col-12 col-md-4 flex-grow-1">
+                            <select name="status" class="form-select">
+                                <option value="">Filter Status</option>
+                                <option value="diterima" {{ request('status') == 'diterima' ? 'selected' : '' }}>Diterima</option>
+                                <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                            </select>
+                        </div>
+                        <div class="col-auto flex-shrink-0">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-search"></i> Cari
+                            </button>
+                            <a href="{{ route('kaderisasi.user.index') }}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Reset
+                            </a>
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        <select name="status" class="form-select">
-                            <option value="">Filter Status</option>
-                            <option value="diterima" {{ request('status') == 'diterima' ? 'selected' : '' }}>Diterima</option>
-                            <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
-                        </select>
-                    </div>
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-success">
-                            <i class="bi bi-search"></i> Cari
-                        </button>
-                        <a href="{{ route('kaderisasi.user.index') }}" class="btn btn-secondary">
-                            <i class="bi bi-x-circle"></i> Reset
-                        </a>
-                    </div>
-                </div>
-            </form>
+                </form>
+            </div>
+
 
             @if(session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
