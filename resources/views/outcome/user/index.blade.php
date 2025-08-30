@@ -1,194 +1,193 @@
-@extends('layouts.app')
+<?php
 
-@section('content')
+namespace App\Http\Controllers;
 
-<!-- Custom Styles -->
-<style>
-    body {
-        background: rgb(236, 244, 239) !important;
+use App\Models\Outcome;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Support\Facades\DB;
+
+class OutcomeController extends Controller
+{
+public function index(Request $request)
+{
+    $user = Auth::user();
+    $search = $request->input('search');
+    $statusFilter = $request->input('status');
+
+    // ✅ Ambil data "Menunggu Verifikasi"
+    $outcomesMenunggu = DB::table('outcomes')
+        ->join('users', 'users.nik', '=', 'outcomes.nik')
+        ->select('outcomes.*', 'users.name as user_name')
+        ->when($user->role !== 'admin', fn($q) => $q->where('outcomes.nik', $user->nik))
+        ->when($search, function ($q) use ($search, $user) {
+            $q->where(function ($query) use ($search, $user) {
+                $query->where('outcomes.judul', 'like', "%{$search}%")
+                      ->orWhere('outcomes.nama_kegiatan', 'like', "%{$search}%")
+                      ->orWhere('outcomes.dapil', 'like', "%{$search}%");
+                if ($user->role === 'admin') {
+                    $query->orWhere('users.name', 'like', "%{$search}%");
+                }
+            });
+        })
+        ->where('outcomes.status', 'terkirim')
+        ->orderBy('outcomes.created_at', 'desc')
+        ->get();
+
+    // ✅ Ambil data untuk Riwayat (Diterima/Ditolak)
+    $query = DB::table('outcomes')
+        ->join('users', 'users.nik', '=', 'outcomes.nik')
+        ->select('outcomes.*', 'users.name as user_name')
+        ->whereIn('outcomes.status', ['diterima', 'ditolak']);
+
+    if ($user->role !== 'admin') {
+        $query->where('outcomes.nik', $user->nik);
     }
-    .page-content {
-        padding-left: 1.5rem !important;
-        padding-right: 1.5rem;
-    }
-    .table tbody tr {
-        vertical-align: middle;
-    }
-    .table tbody tr + tr {
-        border-top: 12px solid #f2f7f5;
-    }
-    .table td, .table th {
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-    }
-    .badge {
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 0.85rem;
-    }
-    .badge-terkirim { background-color: #ffc107; color: black; }
-    .badge-diterima { background-color: #198754; color: white; }
-    .badge-ditolak { background-color: #dc3545; color: white; }
-    .btn-sm {
-        font-size: 0.85rem;
-        padding: 0.3rem 0.6rem;
-        border-radius: 6px;
-    }
-    .btn-outline-secondary i {
-        margin-right: 4px;
-    }
-</style>
 
-<div class="mt-4">
-    <div class="card-container shadow-sm border-0">
-        <div class="page-heading mb-3">
-            <h3 class="mb-1">Outcome Anda</h3>
-            <p class="text-muted mb-0">Berikut merupakan data outcome yang telah Anda laporkan.</p>
-        </div>
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3 gap-5">
-                <a href="{{ route('outcome.user.create') }}" class="btn btn-outline-success  flex-shrink-0 mb-2 mb-md-0">
-                    <i class="bi bi-plus-lg"></i> Tambah Outcome
-                </a>
-                <form method="GET" action="{{ route('outcome.user.index') }}" class="flex-grow-1">
-                    <div class="row g-2 align-items-center flex-nowrap">
-                        <div class="col-12 col-md-5 flex-grow-1">
-                            <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Cari judul, kegiatan, atau dapil...">
-                        </div>
-                        <div class="col-12 col-md-4 flex-grow-1">
-                            <select name="status" class="form-select">
-                                <option value="">Filter Status</option>
-                                <option value="diterima" {{ request('status') == 'diterima' ? 'selected' : '' }}>Diterima</option>
-                                <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
-                            </select>
-                        </div>
-                        <div class="col-auto flex-shrink-0">
-                            <button type="submit" class="btn btn-success">
-                                <i class="bi bi-search"></i> Cari
-                            </button>
-                            <a href="{{ route('outcome.user.index') }}" class="btn btn-secondary">
-                                <i class="bi bi-x-circle"></i> Reset
-                            </a>
-                        </div>
-                    </div>
-                </form>
-            </div>
+    if ($search) {
+        $query->where(function ($q) use ($search, $user) {
+            $q->where('outcomes.judul', 'like', "%{$search}%")
+              ->orWhere('outcomes.nama_kegiatan', 'like', "%{$search}%")
+              ->orWhere('outcomes.dapil', 'like', "%{$search}%");
+            if ($user->role === 'admin') {
+                $q->orWhere('users.name', 'like', "%{$search}%");
+            }
+        });
+    }
 
-            {{-- Search & Filter --}}
+    if ($statusFilter) {
+        $query->where('outcomes.status', $statusFilter);
+    }
 
-            @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
+    // Export CSV (opsional)
+    if ($request->has('export') && $request->export === 'csv') {
+        $outcomes = $query->orderBy('outcomes.tanggal', 'desc')->get();
+        // Tetap gunakan StreamedResponse seperti sebelumnya
+    }
 
-            {{-- Menunggu Verifikasi --}}
-            @if($outcomesMenunggu->isNotEmpty())
-            <div class="mb-5">
-                <h4 class="mb-3">Menunggu Verifikasi</h4>
-                <div class="card shadow-sm border-0">
-                    <div class="card-body table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Judul</th>
-                                    <th>Tanggal</th>
-                                    <th>Nama Kegiatan</th>
-                                    <th>Dokumentasi</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($outcomesMenunggu as $outcome)
-                                <tr>
-                                    <td>{{ $outcome->judul }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($outcome->tanggal)->format('d-m-Y') }}</td>
-                                    <td>{{ $outcome->nama_kegiatan }}</td>
-                                    <td>
-                                        @php
-                                            $files = json_decode($outcome->dokumentasi ?? '[]', true);
-                                        @endphp
+    $outcomes = $query->orderBy('outcomes.tanggal', 'desc')->paginate(10);
 
-                                        @if(is_array($files) && count($files))
-                                            @foreach($files as $file)
-                                                <a href="{{ asset('storage/' . $file) }}" target="_blank" class="btn btn-outline-secondary btn-sm mb-1">
-                                                    <i class="bi bi-file-earmark-text"></i> Lihat
-                                                </a>
-                                            @endforeach
-                                        @else
-                                            <span class="text-muted">Tidak ada</span>
-                                        @endif
-                                    </td>
-                                    <td><span class="badge badge-terkirim">Terkirim</span></td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            @endif
+    return view('outcome.user.index', compact('outcomes', 'outcomesMenunggu', 'search', 'statusFilter'));
+}
 
-            {{-- Riwayat Outcome --}}
-            <h4 class="mb-3">Outcome Disetujui / Ditolak</h4>
-            <div class="card shadow-sm border-0">
-                <div class="card-body table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Judul</th>
-                                <th>Tanggal</th>
-                                <th>Nama Kegiatan</th>
-                                <th>Dapil</th>
-                                <th>Manfaat</th>
-                                <th>Status</th>
-                                <th class="text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($outcomes as $outcome)
-                            <tr>
-                                <td>{{ $outcome->judul }}</td>
-                                <td>{{ \Carbon\Carbon::parse($outcome->tanggal)->format('d-m-Y') }}</td>
-                                <td>{{ $outcome->nama_kegiatan }}</td>
-                                <td>{{ $outcome->dapil }}</td>
-                                <td>{{ \Illuminate\Support\Str::limit($outcome->manfaat, 50) }}</td>
-                                <td>
-                                    <span class="badge
-                                        {{ $outcome->status == 'terkirim' ? 'badge-terkirim' :
-                                           ($outcome->status == 'diterima' ? 'badge-diterima' :
-                                           ($outcome->status == 'ditolak' ? 'badge-ditolak' : '')) }}">
-                                        {{ ucfirst($outcome->status) }}
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <a href="{{ route('outcome.user.show', $outcome->id) }}" class="btn btn-sm btn-outline-info mb-1">
-                                        <i class="bi bi-eye"></i> Detail
-                                    </a>
-                                    <a href="{{ route('outcome.user.edit', $outcome->id) }}" class="btn btn-sm btn-outline-warning mb-1">
-                                        <i class="bi bi-pencil-square"></i> Edit
-                                    </a>
-                                    <form action="{{ route('outcome.user.destroy', $outcome->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-sm btn-outline-danger mb-1">
-                                            <i class="bi bi-trash"></i> Hapus
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="7" class="text-center text-muted">Tidak ada data outcome yang disetujui.</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                    <div class="mt-3">
-                        {{ $outcomes->appends(request()->query())->links() }}
-                    </div>
-                </div>
-            </div>
+    public function create()
+    {
+        return view('outcome.user.create');
+    }
 
-        </div>
-    </div>
-</div>
-@endsection
+    public function store(Request $request)
+    {
+        $request->validate([
+            'judul' => 'required|string|max:255',
+            'tanggal' => 'required|date',
+            'nama_kegiatan' => 'required|string|max:255',
+            'keterangan' => 'nullable|string',
+            'manfaat' => 'nullable|string',
+            'dapil' => 'required|string|max:255',
+            'dokumentasi.*' => 'nullable|mimes:jpg,jpeg,png,webp,pdf|max:2048',
+        ]);
+
+        $files = [];
+        if ($request->hasFile('dokumentasi')) {
+            foreach ($request->file('dokumentasi') as $file) {
+                $files[] = $file->store('outcomes', 'public');
+            }
+        }
+
+        Outcome::create([
+            'nik' => Auth::user()->nik,
+            'judul' => $request->judul,
+            'tanggal' => $request->tanggal,
+            'nama_kegiatan' => $request->nama_kegiatan,
+            'keterangan' => $request->keterangan,
+            'manfaat' => $request->manfaat,
+            'dapil' => $request->dapil,
+            'dokumentasi' => json_encode($files),
+            'status' => 'terkirim',
+        ]);
+
+        return redirect()->route('outcome.user.index')->with('success', 'Outcome berhasil ditambahkan.');
+    }
+
+    public function show($id)
+    {
+        $outcome = Outcome::findOrFail($id);
+        return view('outcome.user.show', compact('outcome'));
+    }
+
+    public function edit($id)
+    {
+        $outcome = Outcome::findOrFail($id);
+        return view('outcome.user.edit', compact('outcome'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $outcome = Outcome::findOrFail($id);
+
+        $request->validate([
+            'judul' => 'required|string|max:255',
+            'tanggal' => 'required|date',
+            'nama_kegiatan' => 'required|string|max:255',
+            'keterangan' => 'nullable|string',
+            'manfaat' => 'nullable|string',
+            'dapil' => 'required|string|max:255',
+            'dokumentasi.*' => 'nullable|mimes:jpg,jpeg,png,webp,pdf|max:2048',
+        ]);
+
+        $files = json_decode($outcome->dokumentasi ?? '[]', true);
+
+        if ($request->hasFile('dokumentasi')) {
+            foreach ($request->file('dokumentasi') as $file) {
+                $files[] = $file->store('outcomes', 'public');
+            }
+        }
+
+        $updateData = [
+            'judul' => $request->judul,
+            'tanggal' => $request->tanggal,
+            'nama_kegiatan' => $request->nama_kegiatan,
+            'keterangan' => $request->keterangan,
+            'manfaat' => $request->manfaat,
+            'dapil' => $request->dapil,
+            'dokumentasi' => json_encode($files),
+            'status' => $outcome->status === 'ditolak' ? 'terkirim' : $outcome->status,
+            'alasan_tolak' => $outcome->status === 'ditolak' ? null : $outcome->alasan_tolak,
+        ];
+
+        $outcome->update($updateData);
+
+        return redirect()->route('outcome.user.index')->with('success', 'Outcome berhasil diperbarui dan dikirim untuk verifikasi.');
+    }
+    public function destroy($id)
+    {
+        $outcome = Outcome::findOrFail($id);
+
+        if ($outcome->dokumentasi) {
+            foreach (json_decode($outcome->dokumentasi, true) as $file) {
+                Storage::disk('public')->delete($file);
+            }
+        }
+
+        $outcome->delete();
+
+        return back()->with('success', 'Outcome berhasil dihapus.');
+    }
+
+    public function deleteFile($id, $index)
+    {
+        $outcome = Outcome::findOrFail($id);
+        $files = json_decode($outcome->dokumentasi, true);
+
+        if (isset($files[$index])) {
+            Storage::disk('public')->delete($files[$index]);
+            unset($files[$index]);
+            $outcome->dokumentasi = json_encode(array_values($files));
+            $outcome->save();
+        }
+
+        return back()->with('success', 'Dokumentasi berhasil dihapus.');
+    }
+}

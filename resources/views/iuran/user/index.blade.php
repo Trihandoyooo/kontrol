@@ -84,36 +84,6 @@
                 <h4 class="mb-0">Rp {{ number_format($totalDisetujui, 0, ',', '.') }}</h4>
             </div>
 
-            {{-- Progress Per Kategori --}}
-            <div class="page-heading">
-                <h3>Progress Per Kategori</h3>
-            </div>
-            <div class="overflow-auto pb-2">
-                <div class="d-flex flex-row gap-3" style="min-width: 600px;">
-                    @foreach($progressPerKategori as $kategori => $data)
-                        <div class="card border-0 shadow-sm flex-shrink-0" style="min-width: 250px;">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center mb-2 gap-3">
-                                    <h6 class="mb-0 text-truncate" title="{{ $kategori }}">{{ $kategori }}</h6>
-                                    <span class="badge bg-success">{{ $data['persentase'] }}%</span>
-                                </div>
-                                <p class="mb-2 fw-bold small">
-                                    Rp {{ number_format($data['terkumpul'], 0, ',', '.') }} /
-                                    Rp {{ number_format($data['target'], 0, ',', '.') }}
-                                </p>
-                                <div class="progress">
-                                    <div class="progress-bar" role="progressbar"
-                                        style="width: {{ $data['persentase'] }}%;"
-                                        aria-valuenow="{{ $data['persentase'] }}" aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-
-            <hr class="my-4">
 
             {{-- Tabel Menunggu Verifikasi --}}
             @if($iurans->where('status', 'terkirim')->isNotEmpty())

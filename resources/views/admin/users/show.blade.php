@@ -33,14 +33,13 @@
         align-items: center;
     }
 
-    .left-panel img {
-        width: 100%;
-        height: auto;
-        border-radius: 10px;
-        border: 1px solid #ccc;
-        object-fit: cover;
-        max-width: 220px;
-    }
+.left-panel img {
+    width: 220px;
+    height: 280px;        /* tinggi fix */
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    object-fit: cover;    /* supaya gambar tetap proporsional */
+}
 
     .dprd-info-card {
         width: 100%;

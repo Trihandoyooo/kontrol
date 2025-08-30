@@ -6,71 +6,76 @@ use App\Models\Outcome;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Support\Facades\DB;
 
 class OutcomeController extends Controller
 {
-public function index(Request $request)
-{
-    $user = Auth::user();
-    $search = $request->input('search');
-    $statusFilter = $request->input('status');
+    public function index(Request $request)
+    {
+        $user = Auth::user();
+        $search = $request->input('search');
+        $statusFilter = $request->input('status');
 
-    // ✅ Ambil data "Menunggu Verifikasi"
-    $outcomesMenunggu = DB::table('outcomes')
-        ->join('users', 'users.nik', '=', 'outcomes.nik')
-        ->select('outcomes.*', 'users.name as user_name')
-        ->when($user->role !== 'admin', fn($q) => $q->where('outcomes.nik', $user->nik))
-        ->when($search, function ($q) use ($search, $user) {
-            $q->where(function ($query) use ($search, $user) {
-                $query->where('outcomes.judul', 'like', "%{$search}%")
-                      ->orWhere('outcomes.nama_kegiatan', 'like', "%{$search}%")
-                      ->orWhere('outcomes.dapil', 'like', "%{$search}%");
+        // === Data Menunggu Verifikasi ===
+        $outcomesMenunggu = DB::table('outcomes')
+            ->join('users', 'users.nik', '=', 'outcomes.nik')
+            ->select('outcomes.*', 'users.name as user_name')
+            ->when($user->role !== 'admin', fn($q) => $q->where('outcomes.nik', $user->nik))
+            ->when($search, function ($q) use ($search, $user) {
+                $q->where(function ($query) use ($search, $user) {
+                    $query->where('outcomes.judul', 'like', "%{$search}%")
+                          ->orWhere('outcomes.nama_kegiatan', 'like', "%{$search}%")
+                          ->orWhere('outcomes.dapil', 'like', "%{$search}%");
+                    if ($user->role === 'admin') {
+                        $query->orWhere('users.name', 'like', "%{$search}%");
+                    }
+                });
+            })
+            ->where('outcomes.status', 'terkirim')
+            ->orderBy('outcomes.created_at', 'desc')
+            ->get()
+            ->map(function ($item) {
+                $item->dokumentasi = json_decode($item->dokumentasi, true) ?? [];
+                return $item;
+            });
+
+        // === Data Riwayat (diterima/ditolak) ===
+        $query = DB::table('outcomes')
+            ->join('users', 'users.nik', '=', 'outcomes.nik')
+            ->select('outcomes.*', 'users.name as user_name')
+            ->whereIn('outcomes.status', ['diterima', 'ditolak']);
+
+        if ($user->role !== 'admin') {
+            $query->where('outcomes.nik', $user->nik);
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search, $user) {
+                $q->where('outcomes.judul', 'like', "%{$search}%")
+                  ->orWhere('outcomes.nama_kegiatan', 'like', "%{$search}%")
+                  ->orWhere('outcomes.dapil', 'like', "%{$search}%");
                 if ($user->role === 'admin') {
-                    $query->orWhere('users.name', 'like', "%{$search}%");
+                    $q->orWhere('users.name', 'like', "%{$search}%");
                 }
             });
-        })
-        ->where('outcomes.status', 'terkirim')
-        ->orderBy('outcomes.created_at', 'desc')
-        ->get();
+        }
 
-    // ✅ Ambil data untuk Riwayat (Diterima/Ditolak)
-    $query = DB::table('outcomes')
-        ->join('users', 'users.nik', '=', 'outcomes.nik')
-        ->select('outcomes.*', 'users.name as user_name')
-        ->whereIn('outcomes.status', ['diterima', 'ditolak']);
+        if ($statusFilter) {
+            $query->where('outcomes.status', $statusFilter);
+        }
 
-    if ($user->role !== 'admin') {
-        $query->where('outcomes.nik', $user->nik);
-    }
+        $outcomes = $query
+            ->orderBy('outcomes.tanggal', 'desc')
+            ->paginate(10);
 
-    if ($search) {
-        $query->where(function ($q) use ($search, $user) {
-            $q->where('outcomes.judul', 'like', "%{$search}%")
-              ->orWhere('outcomes.nama_kegiatan', 'like', "%{$search}%")
-              ->orWhere('outcomes.dapil', 'like', "%{$search}%");
-            if ($user->role === 'admin') {
-                $q->orWhere('users.name', 'like', "%{$search}%");
-            }
+        // Ubah JSON dokumentasi jadi array
+        $outcomes->getCollection()->transform(function ($item) {
+            $item->dokumentasi = json_decode($item->dokumentasi, true) ?? [];
+            return $item;
         });
+
+        return view('outcome.user.index', compact('outcomes', 'outcomesMenunggu', 'search', 'statusFilter'));
     }
-
-    if ($statusFilter) {
-        $query->where('outcomes.status', $statusFilter);
-    }
-
-    // Export CSV (opsional)
-    if ($request->has('export') && $request->export === 'csv') {
-        $outcomes = $query->orderBy('outcomes.tanggal', 'desc')->get();
-        // Tetap gunakan StreamedResponse seperti sebelumnya
-    }
-
-    $outcomes = $query->orderBy('outcomes.tanggal', 'desc')->paginate(10);
-
-    return view('outcome.user.index', compact('outcomes', 'outcomesMenunggu', 'search', 'statusFilter'));
-}
 
     public function create()
     {
@@ -114,12 +119,14 @@ public function index(Request $request)
     public function show($id)
     {
         $outcome = Outcome::findOrFail($id);
+        $outcome->dokumentasi = json_decode($outcome->dokumentasi, true) ?? [];
         return view('outcome.user.show', compact('outcome'));
     }
 
     public function edit($id)
     {
         $outcome = Outcome::findOrFail($id);
+        $outcome->dokumentasi = json_decode($outcome->dokumentasi, true) ?? [];
         return view('outcome.user.edit', compact('outcome'));
     }
 
@@ -145,7 +152,7 @@ public function index(Request $request)
             }
         }
 
-        $updateData = [
+        $outcome->update([
             'judul' => $request->judul,
             'tanggal' => $request->tanggal,
             'nama_kegiatan' => $request->nama_kegiatan,
@@ -155,12 +162,11 @@ public function index(Request $request)
             'dokumentasi' => json_encode($files),
             'status' => $outcome->status === 'ditolak' ? 'terkirim' : $outcome->status,
             'alasan_tolak' => $outcome->status === 'ditolak' ? null : $outcome->alasan_tolak,
-        ];
-
-        $outcome->update($updateData);
+        ]);
 
         return redirect()->route('outcome.user.index')->with('success', 'Outcome berhasil diperbarui dan dikirim untuk verifikasi.');
     }
+
     public function destroy($id)
     {
         $outcome = Outcome::findOrFail($id);

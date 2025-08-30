@@ -1,31 +1,105 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>Laporan Iuran Bulanan</title>
+    <meta charset="UTF-8">
+    <title>Laporan Iuran</title>
     <style>
-        body { font-family: sans-serif; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        table, th, td { border: 1px solid black; padding: 8px; }
-        th { background-color: #f2f2f2; }
-        .text-center { text-align: center; }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        .header {
+            display: table;
+            width: 100%;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 5px;
+        }
+        .logo-left,
+        .logo-right {
+            display: table-cell;
+            vertical-align: middle;
+            width: 60px;
+        }
+        .logo-left {
+            text-align: left;
+        }
+        .logo-right {
+            text-align: right;
+        }
+        .logo-left img,
+        .logo-right img {
+            height: 60px;
+            width: 60px;
+            object-fit: contain;
+        }
+        .header-title {
+            display: table-cell;
+            text-align: center;
+            color: #086d46;
+            font-weight: bold;
+        }
+        .header-title h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .header-title p {
+            margin: 2px 0;
+            font-size: 12px;
+            font-weight: bold;
+            color: #086d46;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 6px;
+            text-align: left;
+        }
+        th {
+            background-color: #086d46;
+            color: white;
+        }
     </style>
 </head>
 <body>
-    <h2 class="text-center">Laporan Iuran Bulan {{ \Carbon\Carbon::parse($bulan)->translatedFormat('F Y') }}</h2>
 
-    @php
-        $filtered = $iurans->filter(function($item) use ($bulan) {
-            return \Carbon\Carbon::parse($item->tanggal)->format('Y-m') === $bulan
-                && strtolower($item->status) !== 'terkirim';
-        });
-    @endphp
+    <div class="header">
+        <div class="logo-left">
+            <img src="file://{{ public_path('storage/logo/simoleglogo.jpg') }}" alt="Logo Aplikasi">
+        </div>
+
+        <div class="header-title">
+            <h2>Laporan Iuran</h2>
+            <p>Tanggal dan Waktu: {{ now()->format('d-m-Y H:i:s') }}</p>
+            <p>Periode: {{ $periode }}</p>
+        </div>
+
+        <div class="logo-right">
+            <img src="file://{{ public_path('storage/logo/pkblogo.jpg') }}" alt="Logo Partai">
+        </div>
+    </div>
+
+@php
+    $filtered = $iurans->filter(function($item) {
+        return in_array(strtolower($item->status), ['diterima', 'ditolak']);
+    });
+@endphp
+
 
     @if($filtered->isEmpty())
-        <p class="text-center"><em>Belum ada transaksi bulan ini.</em></p>
+        <p class="text-center"><em>Belum ada transaksi pada periode ini.</em></p>
     @else
     <table>
         <thead>
             <tr>
+                <th>No</th>
                 <th>Nama</th>
                 <th>Jenis Iuran</th>
                 <th>Nominal</th>
@@ -34,8 +108,9 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($filtered as $item)
+            @foreach ($filtered as $i => $item)
                 <tr>
+                    <td>{{ $i + 1 }}</td>
                     <td>{{ $item->user->name }}</td>
                     <td>{{ $item->jenis_iuran }}</td>
                     <td>Rp {{ number_format($item->nominal, 0, ',', '.') }}</td>
@@ -46,5 +121,6 @@
         </tbody>
     </table>
     @endif
+
 </body>
 </html>

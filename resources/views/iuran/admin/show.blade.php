@@ -70,9 +70,11 @@
     }
 </style>
 
-<div class="card-wrapper">
-    <h4>Detail Iuran</h4>
-    <p class="text-muted mb-4">Menampilkan detail iuran serta status verifikasi dari admin.</p>
+<div class="card-container mt-4">
+    <div class="page-heading mb-3">
+        <h3>Detail Iuran</h3>
+        <p class="text-muted mb-4">Menampilkan detail iuran dan status verifikasi.</p>
+    </div>
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>

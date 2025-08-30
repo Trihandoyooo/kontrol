@@ -70,31 +70,42 @@ class KaderisasiController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'nik' => 'required|string|max:20',
-            'judul' => 'required|string|max:255',
-            'tanggal' => 'required|date',
-            'dokumentasi.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-            'peserta' => 'nullable|string',
-            'catatan' => 'nullable|string',
-            'status' => 'required|in:terkirim,diterima,ditolak',
-            'alasan_tolak' => 'nullable|string',
-        ]);
+{
+    $validated = $request->validate([
+        'judul' => 'required|string|max:255',
+        'tanggal' => 'required|date',
+        'dokumentasi' => 'required|array|min:1',
+        'dokumentasi.*' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+        'peserta' => 'nullable|string',
+        'catatan' => 'nullable|string',
+    ], [
+        'judul.required' => 'Judul kaderisasi wajib diisi.',
+        'tanggal.required' => 'Tanggal wajib diisi.',
+        'dokumentasi.required' => 'Minimal unggah satu dokumentasi.',
+        'dokumentasi.min' => 'Minimal unggah satu dokumentasi.',
+        'dokumentasi.*.required' => 'Setiap file dokumentasi wajib diisi.',
+        'dokumentasi.*.file' => 'Dokumentasi harus berupa file.',
+        'dokumentasi.*.mimes' => 'Dokumentasi harus berupa JPG, JPEG, PNG, atau PDF.',
+        'dokumentasi.*.max' => 'Ukuran file maksimal 2MB.',
+    ]);
 
-        $files = [];
-        if ($request->hasFile('dokumentasi')) {
-            foreach ($request->file('dokumentasi') as $file) {
-                $files[] = $file->store('kaderisasi_dokumentasi', 'public');
-            }
+    $files = [];
+    if ($request->hasFile('dokumentasi')) {
+        foreach ($request->file('dokumentasi') as $file) {
+            $files[] = $file->store('kaderisasi_dokumentasi', 'public');
         }
-
-        $validated['dokumentasi'] = json_encode($files);
-
-        Kaderisasi::create($validated);
-
-        return redirect()->route('kaderisasi.user.index')->with('success', 'Data kaderisasi berhasil disimpan.');
     }
+
+    $validated['nik'] = auth()->user()->nik;
+    $validated['status'] = 'terkirim';
+    $validated['alasan_tolak'] = null;
+    $validated['dokumentasi'] = json_encode($files);
+
+    Kaderisasi::create($validated);
+
+    return redirect()->route('kaderisasi.user.index')->with('success', 'Data kaderisasi berhasil disimpan.');
+}
+
 
     public function show(Kaderisasi $kaderisasi)
     {
@@ -117,7 +128,7 @@ class KaderisasiController extends Controller
             'tanggal' => 'required|date',
             'peserta' => 'nullable|string',
             'catatan' => 'nullable|string',
-            'dokumentasi.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'dokumentasi.*' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5096',
         ]);
 
         $existingFiles = json_decode($kaderisasi->dokumentasi, true) ?? [];

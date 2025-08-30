@@ -49,249 +49,253 @@
             </li>
         </ul>
 
+        <div class="tab-content" id="iuranTabContent">
+            <!-- Tab Statistik -->
+            <div class="tab-pane fade show active" id="statistik" role="tabpanel">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <h2>Ringkasan Statistik Iuran</h2>
+                        <p class="text-subtitle text-muted">Berikut merupakan ringkasan total iuran dan rekap pengguna.</p>
 
-    <div class="tab-content" id="iuranTabContent">
-        <!-- Tab Statistik -->
-        <div class="tab-pane fade show active" id="statistik" role="tabpanel">
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body">
-                    <h2>Ringkasan Statistik Iuran</h2>
-                    <p class="text-subtitle text-muted">Berikut merupakan ringkasan total iuran dan rekap pengguna.</p>
+                        <!-- Ringkasan Semua Total -->
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="card shadow-sm border-0" style="background-color: #198754; color: white;">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-white">Total Iuran Diterima</h6>
+                                        <h5 class="fw-bold text-white">Rp {{ number_format($totalDiterima, 0, ',', '.') }}</h5>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <!-- Ringkasan Semua Total -->
-                    <div class="row mb-4">
-                        <div class="col-md-4">
-                            <div class="card shadow-sm border-0" style="background-color: #198754; color: white;">
-                                <div class="card-body">
-                                    <h6 class="card-title text-white">Total Iuran Diterima</h6>
-                                    <h5 class="fw-bold text-white">Rp {{ number_format($totalDiterima, 0, ',', '.') }}</h5>
+                            <div class="col-md-4">
+                                <div class="card shadow-sm border-0" style="background-color: #ffc107; color: black;">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Total Iuran Terkirim/Belum Di Verifikasi</h6>
+                                        <h5 class="fw-bold text-black">Rp {{ number_format($totalTerkirim, 0, ',', '.') }}</h5>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="card shadow-sm border-0" style="background-color: #dc3545; color: white;">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Total Iuran Ditolak</h6>
+                                        <h5 class="fw-bold text-white">Rp {{ number_format($totalDitolak, 0, ',', '.') }}</h5>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-md-4">
-                            <div class="card shadow-sm border-0" style="background-color: #ffc107; color: black;">
-                                <div class="card-body">
-                                    <h6 class="card-title">Total Iuran Terkirim/Belum Di Verifikasi</h6>
-                                    <h5 class="fw-bold text-black">Rp {{ number_format($totalTerkirim, 0, ',', '.') }}</h5>
+                        <!-- Top Penyumbang + Rincian -->
+                        <div class="card shadow-sm border-0 mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Top Penyumbang (dengan rincian kategori)</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-striped align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th>Nama</th>
+                                                <th>Total</th>
+                                                <th>Rincian per Kategori</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($semuaTotalUser as $userTotal)
+                                                <tr>
+                                                    <td>{{ $userTotal->user->name ?? '-' }}</td>
+                                                    <td><strong>Rp {{ number_format($userTotal->total, 0, ',', '.') }}</strong></td>
+                                                    <td>
+                                                        <ul class="mb-0">
+                                                            @foreach($userTotal->rincian as $jenis => $nilai)
+                                                                <li>{{ $jenis }}: Rp {{ number_format($nilai, 0, ',', '.') }}</li>
+                                                            @endforeach
+                                                        </ul>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-md-4">
-                            <div class="card shadow-sm border-0" style="background-color: #dc3545; color: white;">
-                                <div class="card-body">
-                                    <h6 class="card-title">Total Iuran Ditolak</h6>
-                                    <h5 class="fw-bold text-white">Rp {{ number_format($totalDitolak, 0, ',', '.') }}</h5>
+                    </div> <!-- tutup card-body -->
+                </div> <!-- tutup card -->
+            </div> <!-- tutup tab statistik -->
+
+            <!-- Tab Alokasi Dana -->
+            <div class="tab-pane fade" id="alokasi" role="tabpanel">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0">Alokasi Dana oleh Admin</h5>
+                            <a href="{{ route('admin.alokasi.create') }}" class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-plus-circle"></i> Tambah Alokasi
+                            </a>
+                        </div>
+
+                        <!-- Grafik Pie Alokasi Dana -->
+                        <div class="card shadow-sm border-0 mb-4">
+                            <div class="card-body">
+                                <div style="max-width: 300px; margin: auto;">
+                                    <canvas id="alokasiPieChart"></canvas>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Total Per User -->
-                    <div class="card shadow-sm border-0 mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title">Total Iuran Diterima per Pengguna</h5>
-                            <div class="table-responsive">
-                                <table class="table table-sm table-striped align-middle">
-                                    <thead>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nama Kegiatan</th>
+                                        <th>Jumlah</th>
+                                        <th>Tanggal</th>
+                                        <th>Deskripsi</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($alokasis as $alokasi)
                                         <tr>
-                                            <th>Nama Pengguna</th>
-                                            <th>Total Diterima</th>
+                                            <td>{{ $alokasi->nama_kegiatan }}</td>
+                                            <td>Rp {{ number_format($alokasi->jumlah, 0, ',', '.') }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($alokasi->tanggal)->format('d-m-Y') }}</td>
+                                            <td>{{ \Illuminate\Support\Str::limit($alokasi->deskripsi, 50) }}</td>
+                                            <td>
+                                                <a href="{{ route('admin.alokasi.show', $alokasi->id) }}" class="btn btn-outline-info btn-sm">
+                                                    <i class="bi bi-eye me-1"></i>Show
+                                                </a>
+                                                <a href="{{ route('admin.alokasi.edit', $alokasi->id) }}" class="btn btn-outline-warning btn-sm">
+                                                    <i class="bi bi-pencil me-1"></i>Edit
+                                                </a>
+                                                <form action="{{ route('admin.alokasi.destroy', $alokasi->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus alokasi ini?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button class="btn btn-outline-danger btn-sm">
+                                                        <i class="bi bi-trash me-1"></i>Hapus
+                                                    </button>
+                                                </form>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($semuaTotalUser as $item)
-                                            <tr>
-                                                <td>{{ $item->user->name }}</td>
-                                                <td><span class="badge bg-success text-white">Rp {{ number_format($item->total, 0, ',', '.') }}</span></td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="2" class="text-muted text-center">Belum ada data</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">Belum ada alokasi dana dicatat.</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Tab Alokasi Dana -->
-        <div class="tab-pane fade" id="alokasi" role="tabpanel">
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="card-title mb-0">Alokasi Dana oleh Admin</h5>
-                        <a href="{{ route('admin.alokasi.create') }}" class="btn btn-sm btn-outline-success">
-                            <i class="bi bi-plus-circle"></i> Tambah Alokasi
-                        </a>
+            <!-- Tab Data Iuran -->
+            <div class="tab-pane fade" id="iuran" role="tabpanel">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Filter & Ekspor Data Iuran</h5>
+                        <form method="GET" action="{{ route('admin.iuran.index') }}">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-3">
+                                    <label class="form-label">Jenis Iuran</label>
+                                    <select name="jenis_iuran" class="form-select">
+                                        <option value="">Semua</option>
+                                        @foreach(['Iuran Bulanan', 'Sumbangan Fraksi', 'Dana Infaq Shadaqoh dan Zakat (ZIS)', 'Dana Khitmat', 'Dana Kompensasi Kepada Caleg', 'Dana Insidensial', 'Dana Lainnya'] as $jenis)
+                                            <option value="{{ $jenis }}" {{ request('jenis_iuran') == $jenis ? 'selected' : '' }}>{{ $jenis }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <label class="form-label">Status</label>
+                                    <select name="status" class="form-select">
+                                        <option value="">Semua</option>
+                                        <option value="terkirim" {{ request('status') == 'terkirim' ? 'selected' : '' }}>Terkirim</option>
+                                        <option value="diterima" {{ request('status') == 'diterima' ? 'selected' : '' }}>Diterima</option>
+                                        <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <label class="form-label">Tanggal Dari</label>
+                                    <input type="date" name="tanggal_dari" class="form-control" value="{{ request('tanggal_dari') }}">
+                                </div>
+
+                                <div class="col-md-2">
+                                    <label class="form-label">Tanggal Sampai</label>
+                                    <input type="date" name="tanggal_sampai" class="form-control" value="{{ request('tanggal_sampai') }}">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label">Cari Nama</label>
+                                    <input type="text" name="nama" class="form-control" placeholder="Nama user..." value="{{ request('nama') }}">
+                                </div>
+
+                                <div class="col-auto d-grid">
+                                    <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i> Filter</button>
+                                </div>
+                                <div class="col-auto d-grid">
+                                    <a href="{{ route('admin.iuran.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i> Reset</a>
+                                </div>
+                                <div class="col-auto d-grid">
+                                    <a href="{{ route('admin.iuran.pdf', request()->query()) }}" class="btn btn-outline-danger" title="Ekspor PDF"><i class="bi bi-file-earmark-pdf"></i> PDF</a>
+                                </div>
+                            </div>
+                        </form>
                     </div>
+                </div>
 
-                    <!-- Grafik Pie Alokasi Dana -->
-<div class="card shadow-sm border-0 mb-4">
-    <div class="card-body">
-        <div style="max-width: 300px; margin: auto;">
-    <canvas id="alokasiPieChart"></canvas>
-</div>
-    </div>
-</div>
-
-                    <div class="table-responsive">
-                       <table class="table table-hover">
-                            <thead class="table-light">
+                <!-- Tabel Iuran -->
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nama</th>
+                                <th>Jenis Iuran</th>
+                                <th>Nominal</th>
+                                <th>Tanggal</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($iurans as $iuran)
                                 <tr>
-                                    <th>Nama Kegiatan</th>
-                                    <th>Jumlah</th>
-                                    <th>Tanggal</th>
-                                    <th>Deskripsi</th>
-                                    <th>Aksi</th>
+                                    <td>{{ $iuran->user->name }}</td>
+                                    <td>{{ $iuran->jenis_iuran }}</td>
+                                    <td>Rp {{ number_format($iuran->nominal, 0, ',', '.') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($iuran->tanggal)->format('d-m-Y') }}</td>
+                                    <td>
+                                        @php
+                                            $badgeClass = 'badge-terkirim';
+                                            if ($iuran->status === 'diterima') $badgeClass = 'badge-diterima';
+                                            elseif ($iuran->status === 'ditolak') $badgeClass = 'badge-ditolak';
+                                        @endphp
+                                        <span class="{{ $badgeClass }}">{{ ucfirst($iuran->status) }}</span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('admin.iuran.show', $iuran->id) }}" class="btn btn-outline-info btn-sm me-1"><i class="bi bi-eye"></i> Detail</a>
+                                        <form action="{{ route('admin.iuran.destroy', $iuran->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-outline-danger btn-sm me-1"><i class="bi bi-trash"></i> Hapus</button>
+                                        </form>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($alokasis as $alokasi)
-                                    <tr>
-                                        <td>{{ $alokasi->nama_kegiatan }}</td>
-                                        <td>Rp {{ number_format($alokasi->jumlah, 0, ',', '.') }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($alokasi->tanggal)->format('d-m-Y') }}</td>
-                                        <td>{{ \Illuminate\Support\Str::limit($alokasi->deskripsi, 50) }}</td>
-<td>
-    <a href="{{ route('admin.alokasi.show', $alokasi->id) }}" class="btn btn-outline-info btn-sm">
-        <i class="bi bi-eye me-1"></i>Show
-    </a>
-    <a href="{{ route('admin.alokasi.edit', $alokasi->id) }}" class="btn btn-outline-warning btn-sm">
-        <i class="bi bi-pencil me-1"></i>Edit
-    </a>
-    <form action="{{ route('admin.alokasi.destroy', $alokasi->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus alokasi ini?')">
-        @csrf
-        @method('DELETE')
-        <button class="btn btn-outline-danger btn-sm">
-            <i class="bi bi-trash me-1"></i>Hapus
-        </button>
-    </form>
-</td>
-
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5" class="text-center text-muted">Belum ada alokasi dana dicatat.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
+                            @empty
+                                <tr>
+                                    <td colspan="10" class="text-center text-muted">Tidak ada data iuran ditemukan.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-        </div>
 
-        <!-- Tab Data Iuran -->
-        <div class="tab-pane fade" id="iuran" role="tabpanel">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">Filter & Ekspor Data Iuran</h5>
-                    <form method="GET" action="{{ route('admin.iuran.index') }}">
-                        <div class="row g-3 align-items-end">
-                            <div class="col-md-3">
-                                <label class="form-label">Jenis Iuran</label>
-                                <select name="jenis_iuran" class="form-select">
-                                    <option value="">Semua</option>
-                                    @foreach(['Iuran Bulanan', 'Sumbangan Fraksi', 'Dana Infaq Shadaqoh dan Zakat (ZIS)', 'Dana Khitmat', 'Dana Kompensasi Kepada Caleg', 'Dana Insidensial', 'Dana Lainnya'] as $jenis)
-                                        <option value="{{ $jenis }}" {{ request('jenis_iuran') == $jenis ? 'selected' : '' }}>{{ $jenis }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="col-md-2">
-                                <label class="form-label">Status</label>
-                                <select name="status" class="form-select">
-                                    <option value="">Semua</option>
-                                    <option value="terkirim" {{ request('status') == 'terkirim' ? 'selected' : '' }}>Terkirim</option>
-                                    <option value="diterima" {{ request('status') == 'diterima' ? 'selected' : '' }}>Diterima</option>
-                                    <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-2">
-                                <label class="form-label">Tanggal Dari</label>
-                                <input type="date" name="tanggal_dari" class="form-control" value="{{ request('tanggal_dari') }}">
-                            </div>
-
-                            <div class="col-md-2">
-                                <label class="form-label">Tanggal Sampai</label>
-                                <input type="date" name="tanggal_sampai" class="form-control" value="{{ request('tanggal_sampai') }}">
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label">Cari Nama</label>
-                                <input type="text" name="nama" class="form-control" placeholder="Nama user..." value="{{ request('nama') }}">
-                            </div>
-
-                            <div class="col-auto d-grid">
-                                <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i> Filter</button>
-                            </div>
-                            <div class="col-auto d-grid">
-                                <a href="{{ route('admin.iuran.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i> Reset</a>
-                            </div>
-                            <div class="col-auto d-grid">
-                                <a href="{{ route('admin.iuran.pdf', request()->query()) }}" class="btn btn-outline-danger" title="Ekspor PDF"><i class="bi bi-file-earmark-pdf"></i> PDF</a>
-                            </div>
-                        </div>
-                    </form>
+                <!-- Pagination -->
+                <div class="d-flex justify-content-end mt-3">
+                    {{ $iurans->withQueryString()->links() }}
                 </div>
-            </div>
-
-            <!-- Tabel Iuran -->
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Nama</th>
-                            <th>Jenis Iuran</th>
-                            <th>Nominal</th>
-                            <th>Tanggal</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($iurans as $iuran)
-                            <tr>
-                                <td>{{ $iuran->user->name }}</td>
-                                <td>{{ $iuran->jenis_iuran }}</td>
-                                <td>Rp {{ number_format($iuran->nominal, 0, ',', '.') }}</td>
-                                <td>{{ \Carbon\Carbon::parse($iuran->tanggal)->format('d-m-Y') }}</td>
-                                <td>
-                                    @php
-                                        $badgeClass = 'badge-terkirim';
-                                        if ($iuran->status === 'diterima') $badgeClass = 'badge-diterima';
-                                        elseif ($iuran->status === 'ditolak') $badgeClass = 'badge-ditolak';
-                                    @endphp
-                                    <span class="{{ $badgeClass }}">{{ ucfirst($iuran->status) }}</span>
-                                </td>
-                                <td>
-                                    <a href="{{ route('admin.iuran.show', $iuran->id) }}" class="btn btn-outline-info btn-sm me-1"><i class="bi bi-eye"></i> Detail</a>
-                                    <form action="{{ route('admin.iuran.destroy', $iuran->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-outline-danger btn-sm me-1"><i class="bi bi-trash"></i> Hapus</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="10" class="text-center text-muted">Tidak ada data iuran ditemukan.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination -->
-            <div class="d-flex justify-content-end mt-3">
-                {{ $iurans->withQueryString()->links() }}
             </div>
         </div>
     </div>
@@ -324,15 +328,24 @@
                     legend: {
                         position: 'bottom',
                     },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.label || '';
-                                let value = context.raw || 0;
-                                return label + ': Rp ' + value.toLocaleString('id-ID');
-                            }
-                        }
-                    }
+tooltip: {
+    callbacks: {
+        label: function(context) {
+            let label = context.label || '';
+            let value = context.raw || 0;
+
+            // Format ke Rupiah (tanpa desimal)
+            let formatted = new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(value);
+
+            return label + ': ' + formatted;
+        }
+    }
+}
+
                 }
             },
         };

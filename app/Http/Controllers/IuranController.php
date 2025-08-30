@@ -125,7 +125,7 @@ class IuranController extends Controller
             'nominal' => 'required|numeric|min:1',
             'tanggal' => 'required|date',
             'catatan' => 'nullable|string',
-            'dokumentasi.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'dokumentasi.*' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5012',
         ]);
 
         $validated['nik'] = Auth::user()->nik;
@@ -168,7 +168,7 @@ class IuranController extends Controller
             'nominal' => 'required|numeric|min:1',
             'tanggal' => 'required|date',
             'catatan' => 'nullable|string',
-            'dokumentasi.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'dokumentasi.*' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5012',
         ]);
 
         $iuran = Iuran::where('nik', Auth::user()->nik)->findOrFail($id);

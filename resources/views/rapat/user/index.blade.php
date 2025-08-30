@@ -172,54 +172,56 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($rapats as $rapat)
-                                <tr>
-                                    <td>{{ ucfirst($rapat->jenis_rapat) }}</td>
-                                    <td>{{ $rapat->judul }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($rapat->tanggal)->format('d-m-Y') }}</td>
-                                    <td>{{ $rapat->peserta ?? '-' }}</td>
-                                    <td>
-                                        <span class="badge
-                                            {{ $rapat->status == 'terkirim' ? 'badge-terkirim' :
-                                               ($rapat->status == 'diterima' ? 'badge-diterima' :
-                                               ($rapat->status == 'ditolak' ? 'badge-ditolak' : '')) }}">
-                                            {{ ucfirst($rapat->status) }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        @php $files = json_decode($rapat->dokumentasi); @endphp
-                                        @if($files && count($files))
-                                            @foreach($files as $file)
-                                                <a href="{{ asset('storage/' . $file) }}" target="_blank" class="btn btn-outline-secondary btn-sm mb-1">
-                                                    <i class="bi bi-file-earmark-text"></i> Lihat
-                                                </a>
-                                            @endforeach
-                                        @else
-                                            <span class="text-muted">Tidak ada</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $rapat->catatan ?? '-' }}</td>
-                                    <td class="text-center">
-                                        <a href="{{ route('rapat.user.show', $rapat->id) }}" class="btn btn-sm btn-outline-info">
-                                            <i class="bi bi-eye"></i> Detail
-                                        </a>
-                                        <a href="{{ route('rapat.user.edit', $rapat->id) }}" class="btn btn-sm btn-outline-warning">
-                                            <i class="bi bi-pencil-square"></i> Edit
-                                        </a>
-                                        <form action="{{ route('rapat.user.destroy', $rapat->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin hapus?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-sm btn-outline-danger">
-                                                <i class="bi bi-trash"></i> Hapus
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="8" class="text-center text-muted">Belum ada rapat disetujui atau ditolak.</td>
-                                </tr>
-                            @endforelse
+                           @forelse($rapats as $rapat)
+    @if($rapat->status != 'terkirim')
+    <tr>
+        <td>{{ ucfirst($rapat->jenis_rapat) }}</td>
+        <td>{{ $rapat->judul }}</td>
+        <td>{{ \Carbon\Carbon::parse($rapat->tanggal)->format('d-m-Y') }}</td>
+        <td>{{ $rapat->peserta ?? '-' }}</td>
+        <td>
+            <span class="badge
+                {{ $rapat->status == 'diterima' ? 'badge-diterima' :
+                   ($rapat->status == 'ditolak' ? 'badge-ditolak' : '') }}">
+                {{ ucfirst($rapat->status) }}
+            </span>
+        </td>
+        <td>
+            @php $files = json_decode($rapat->dokumentasi); @endphp
+            @if($files && count($files))
+                @foreach($files as $file)
+                    <a href="{{ asset('storage/' . $file) }}" target="_blank" class="btn btn-outline-secondary btn-sm mb-1">
+                        <i class="bi bi-file-earmark-text"></i> Lihat
+                    </a>
+                @endforeach
+            @else
+                <span class="text-muted">Tidak ada</span>
+            @endif
+        </td>
+        <td>{{ $rapat->catatan ?? '-' }}</td>
+        <td class="text-center">
+            <a href="{{ route('rapat.user.show', $rapat->id) }}" class="btn btn-sm btn-outline-info">
+                <i class="bi bi-eye"></i> Detail
+            </a>
+            <a href="{{ route('rapat.user.edit', $rapat->id) }}" class="btn btn-sm btn-outline-warning">
+                <i class="bi bi-pencil-square"></i> Edit
+            </a>
+            <form action="{{ route('rapat.user.destroy', $rapat->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin hapus?')">
+                @csrf
+                @method('DELETE')
+                <button class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-trash"></i> Hapus
+                </button>
+            </form>
+        </td>
+    </tr>
+    @endif
+@empty
+    <tr>
+        <td colspan="8" class="text-center text-muted">Belum ada rapat disetujui atau ditolak.</td>
+    </tr>
+@endforelse
+
                         </tbody>
                     </table>
                 </div>

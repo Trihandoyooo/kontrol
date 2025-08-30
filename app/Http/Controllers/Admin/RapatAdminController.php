@@ -57,41 +57,45 @@ if ($request->filled('search')) {
     }
 
     // Export PDF data rapat
-    public function exportPdf(Request $request)
-    {
-        $query = Rapat::with('user')->orderBy('tanggal', 'desc');
+public function exportPdf(Request $request)
+{
+    $query = Rapat::with('user')
+        ->whereIn('status', ['diterima', 'ditolak']) // hanya diterima & ditolak
+        ->orderBy('tanggal', 'desc');
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->filled('tanggal_dari')) {
-            $query->whereDate('tanggal', '>=', $request->tanggal_dari);
-        }
-
-        if ($request->filled('tanggal_sampai')) {
-            $query->whereDate('tanggal', '<=', $request->tanggal_sampai);
-        }
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('judul', 'like', "%$search%")
-                  ->orWhere('lokasi', 'like', "%$search%")
-                  ->orWhereHas('user', function ($uq) use ($search) {
-                      $uq->where('name', 'like', "%$search%")
-                         ->orWhere('nik', 'like', "%$search%");
-                  });
-            });
-        }
-
-        $rapats = $query->get();
-
-        $pdf = Pdf::loadView('rapat.admin.pdf', compact('rapats'))
-                  ->setPaper('A4', 'portrait');
-
-        return $pdf->download('laporan_rapat_' . date('Ymd') . '.pdf');
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
     }
+
+    if ($request->filled('tanggal_dari')) {
+        $query->whereDate('tanggal', '>=', $request->tanggal_dari);
+    }
+
+    if ($request->filled('tanggal_sampai')) {
+        $query->whereDate('tanggal', '<=', $request->tanggal_sampai);
+    }
+
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('judul', 'like', "%$search%")
+              ->orWhere('lokasi', 'like', "%$search%")
+              ->orWhereHas('user', function ($uq) use ($search) {
+                  $uq->where('name', 'like', "%$search%")
+                     ->orWhere('nik', 'like', "%$search%");
+              });
+        });
+    }
+
+    $rapats = $query->get();
+
+    $pdf = Pdf::loadView('rapat.admin.pdf', compact('rapats'))
+              ->setPaper('A4', 'portrait');
+
+    $pdf->getDomPDF()->set_option('isRemoteEnabled', true);
+
+    return $pdf->download('laporan_rapat_' . date('Ymd') . '.pdf');
+}
 
     // Update status (terkirim/diterima/ditolak) rapat
     public function updateStatus(Request $request, $id)
